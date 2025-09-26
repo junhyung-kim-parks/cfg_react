@@ -1,0 +1,6 @@
+.env
+.vscode/settings.json
+# dependencies
+/node_modules
+/npm_cache
+npm_cache/

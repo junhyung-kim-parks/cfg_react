@@ -1,0 +1,804 @@
+{
+  "FORM-001": {
+    "pdf": "FORM-001_PRECON_NOTICE.pdf",
+    "fields": {
+      "NoticeDate": "2025-09-10",
+      "ContractorName": "ACME Construction Corp",
+      "ContractorAddress": "123 Main Street, Queens, NY 11375",
+      "ContractNo": "Q-2025-XYZ-001",
+      "DesignAndSupervision": "Design-Build",
+      "Funding": "City",
+      "MeetingDate": "2025-09-18",
+      "MeetingTime": "10:00 AM",
+      "MeetingPlace": "Olmsted Center, Conf Rm A"
+    }
+  },
+  "FORM-002": {
+    "pdf": "FORM-002_STD_PRECON_INFO.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "AwardDate": "2024-08-15",
+      "Amount": 5000000,
+      "CCD": 365,
+      "DesignPM": "Jane Designer, PE",
+      "CD": "John Director",
+      "RE": "Alex Rodriguez, PE",
+      "RE_Email": "alex.rodriguez@parks.nyc.gov"
+    }
+  },
+  "FORM-003": {
+    "pdf": "FORM-003_PRECON_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "TimeAllowedCCD": 365,
+      "ConstructionSupervision": "Design-Build",
+      "Design": "Jane Designer, PE",
+      "AwardDate": "2024-08-15",
+      "BidPrice": 5000000,
+      "Req_ProgressSchedule_Y": true,
+      "Insurance_CGL_Y": true,
+      "DoT_MPT_Y": false
+    }
+  },
+  "FORM-005": {
+    "pdf": "FORM-005_PRECON_MINUTES.pdf",
+    "fields": {
+      "Date": "2025-09-11",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Contractor": "ACME Construction Corp",
+      "Highlights": "Key points, permits, submittals…"
+    }
+  },
+  "FORM-006": {
+    "pdf": "FORM-006_APPROVAL_PRIOR_TO_REGISTRATION.pdf",
+    "fields": {
+      "Date": "2025-09-11",
+      "ContractorName": "ACME Construction Corp",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ContractTitle": "XYZ Park Reconstruction",
+      "OrderToWorkDate": "2025-09-18"
+    }
+  },
+  "FORM-06A": {
+    "pdf": "FORM-06A_REQUEST_TO_DOT_DSL.pdf",
+    "fields": {
+      "DPR_ContractNo": "Q-2025-XYZ-001",
+      "Borough": "Queens",
+      "Design": "Design-Build",
+      "Superv": "Construction Director",
+      "BeginWorkDate": "2025-09-18",
+      "ContactPhone": "718-760-0000",
+      "Attn": "Chief of Operations"
+    }
+  },
+  "FORM-06B": {
+    "pdf": "FORM-06B_INSPECTION_PARK_LIGHTING_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "Borough": "Queens",
+      "Contractor": "ACME Construction Corp",
+      "ResidentEngineer": "Alex Rodriguez, PE",
+      "InspectionDate": "2025-09-19",
+      "Determination": "Operational",
+      "DefectList": ""
+    }
+  },
+  "FORM-007": {
+    "pdf": "FORM-007_FAILURE_TO_START.pdf",
+    "fields": {
+      "ContractorName": "ACME Construction Corp",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Design": "Design-Build",
+      "Superv": "Construction Director",
+      "OrderedToBeginDate": "2025-09-01",
+      "AsOfDate": "2025-09-11",
+      "DeadlineToCommence": "2025-09-15"
+    }
+  },
+  "FORM-008": {
+    "pdf": "FORM-008_MAINTENANCE_OF_PARK_PROPERTY_MEMO.pdf",
+    "fields": {
+      "To": "Borough Commissioner",
+      "From": "Construction Director",
+      "Date": "2025-09-11",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Status_UnderConstruction": true,
+      "Status_Partial": false,
+      "Status_Returned": false,
+      "Status_PartialRelease": false,
+      "Comments": "",
+      "ContactName": "Alex Rodriguez, PE",
+      "ContactPhone": "718-555-1234"
+    }
+  },
+  "FORM-009": {
+    "pdf": "FORM-009_HOMEOWNER_NOTIFICATION.pdf",
+    "fields": {
+      "Date": "2025-09-11",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Homeowner": "John/Jane Doe",
+      "Address": "123 Adjacent St, Queens, NY"
+    }
+  },
+  "FORM-010": {
+    "pdf": "FORM-010_NEW_DOT_STREET_LIGHTING.pdf",
+    "fields": {
+      "Date": "2025-09-11",
+      "DPR_ContractNo": "Q-2025-XYZ-001",
+      "Design": "Design-Build",
+      "Superv": "Construction Director",
+      "BeginWorkDate": "2025-09-20",
+      "Attn": "DOT Division of Street Lighting",
+      "ContactPhone": "718-760-0000"
+    }
+  },
+  "FORM-011": {
+    "pdf": "FORM-011_WEEKLY_PROGRESS_REPORT.pdf",
+    "fields": {
+      "ReportNo": 1,
+      "Date": "2025-09-12",
+      "WeekEnding": "2025-09-12",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Contractor": "ACME Construction Corp",
+      "ProjectDescription": "XYZ Park Reconstruction",
+      "Remarks": ""
+    }
+  },
+  "FORM-012": {
+    "pdf": "FORM-012_CONSULTANT_FIELD_INSPECTION_REPORT.pdf",
+    "fields": {
+      "ReportNo": 1,
+      "DateOfVisit": "2025-09-13",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ContractingFirm": "ACME Construction Corp",
+      "SupervisingConsultant": "ACME Consulting",
+      "ProjectResident": "Alex Rodriguez, PE",
+      "ResidentAtSite_Y": true,
+      "WorkInProgress_Y": true,
+      "ProjectOnSchedule_Y": true,
+      "PercentComplete": 42,
+      "Remarks": "All logs current; minor staffing lag noted."
+    }
+  },
+  "FORM-013SC": {
+    "pdf": "FORM-013_SC_SUBSTANTIAL_COMPLETION_NOTICE.pdf",
+    "fields": {
+      "Date": "2025-09-14",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "InspectionDate": "2025-09-25",
+      "InspectionTime": "09:00 AM",
+      "InspectionPlace": "Site – North Gate",
+      "Intention_NoPunchList_Y": true
+    }
+  },
+  "FORM-013SCU": {
+    "pdf": "FORM-013_SCU_SUBSTANTIAL_COMPLETION_USE_NOTICE.pdf",
+    "fields": {
+      "Date": "2025-09-14",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "InspectionDate": "2025-09-26",
+      "InspectionTime": "10:30 AM",
+      "InspectionPlace": "Site – South Pavilion",
+      "Intention_MinimalFinalPunch_Y": true
+    }
+  },
+  "FORM-013W": {
+    "pdf": "FORM-013_W_WALK_THROUGH_NOTICE.pdf",
+    "fields": {
+      "Date": "2025-09-14",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "WalkThroughDate": "2025-09-20",
+      "WalkThroughTime": "01:30 PM",
+      "WalkThroughPlace": "Entire site"
+    }
+  },
+  "FORM-014W": {
+    "pdf": "FORM-014_W_WALK_THROUGH_REPORT.pdf",
+    "fields": {
+      "Date": "2025-09-21",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "AreaOrWholeProject": "Entire project",
+      "Attendees": "RE, Contractor PM, Inspector",
+      "OutstandingItemsAttachment_Y": true,
+      "Directive_CompleteBeforeSCUse_Y": true
+    }
+  },
+  "FORM-014SC": {
+    "pdf": "FORM-014_SC_REPORT_CERTIFICATE.pdf",
+    "fields": {
+      "Date": "2025-09-27",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "SC_HeldDate": "2025-09-27",
+      "Option1_AllWorkAccepted_Y": false,
+      "Option2_FinalPunchListAttached_Y": true,
+      "PunchListDeadline": "2025-10-15",
+      "GuaranteeExpiry": "2026-09-27",
+      "MaintainInsurance_Y": true
+    }
+  },
+  "FORM-014SCU": {
+    "pdf": "FORM-014_SCU_REPORT_CERTIFICATE.pdf",
+    "fields": {
+      "Date": "2025-09-27",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "SCU_HeldDate": "2025-09-27",
+      "FinalPunchListAttached_Y": true,
+      "PunchListDeadline": "2025-10-12",
+      "InsuranceRequiredUntilPunch_Y": true,
+      "InsuranceComment": "Insurance shall be maintained until all punch list work is fully completed.",
+      "GuaranteeExpiry": "2026-09-27"
+    }
+  },
+  "FORM-015": {
+    "pdf": "FORM-015_PL_INSPECTION_NOTICE.pdf",
+    "fields": {
+      "Date": "2025-09-28",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "PL_InspectionDate": "2025-10-05",
+      "PL_InspectionTime": "08:30 AM",
+      "PL_InspectionPlace": "Job Trailer"
+    }
+  },
+  "FORM-016": {
+    "pdf": "FORM-016_PL_INSPECTION_REPORT.pdf",
+    "fields": {
+      "Date": "2025-10-05",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "SC_UseInspectionDate": "2025-09-12",
+      "PL_InspectionHeldDate": "2025-10-05",
+      "Attendees": "RE, Contractor PM, DPR Inspector",
+      "Option1_AllPLCompleted_Y": false,
+      "Option2_RemainingPLAttached_Y": true,
+      "RemainingPL_Deadline": "2025-10-20",
+      "MaintainInsurance_Y": true
+    }
+  },
+  "FORM-017G": {
+    "pdf": "FORM-017_GUARANTEE_INSPECTION_NOTICE.pdf",
+    "fields": {
+      "Date": "2025-11-01",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "GI_Date": "2025-11-15",
+      "GI_Time": "09:00 AM",
+      "GI_Place": "Site – Main Gate"
+    }
+  },
+  "FORM-017GPL": {
+    "pdf": "FORM-017_GPL_INSPECTION_NOTICE_FOR_GUARANTEE_PUNCH_LIST.pdf",
+    "fields": {
+      "Date": "2025-11-10",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "GPL_InspectionDate": "2025-11-22",
+      "GPL_InspectionTime": "10:00 AM",
+      "GPL_InspectionPlace": "Site – North Gate"
+    }
+  },
+  "FORM-018G": {
+    "pdf": "FORM-018_GUARANTEE_INSPECTION_REPORT.pdf",
+    "fields": {
+      "Date": "2025-11-22",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "GI_HeldDate": "2025-11-22",
+      "Option1_AllWorkMeetsGuarantee_Y": false,
+      "Option2_GPL_Established_Y": true,
+      "GuaranteeMonies": 100000
+    }
+  },
+  "FORM-018GPL": {
+    "pdf": "FORM-018_GPL_GUARANTEE_PUNCH_LIST_INSPECTION_REPORT.pdf",
+    "fields": {
+      "Date": "2025-12-05",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "GPL_InspectionHeldDate": "2025-12-05",
+      "Option1_AllGPLCompleted_Y": true,
+      "Option2_RemainingGPLAttached_Y": false,
+      "GuaranteeMonies": 100000
+    }
+  },
+  "FORM-019": {
+    "pdf": "FORM-019_FAILURE_TO_COMPLETE_FINAL_PUNCH_LIST.pdf",
+    "fields": {
+      "Date": "2025-12-12",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "Superv": "Construction Borough Director",
+      "ExtendedDeadline": "2026-01-05",
+      "MeetingDateIfNeeded": "2026-01-07"
+    }
+  },
+  "FORM-019A": {
+    "pdf": "FORM-019A_ARTICLE_54_64_NOTIFICATION_OF_FAILURE_TO_COMPLETE_FINAL_PUNCH_LIST.pdf",
+    "fields": {
+      "Date": "2026-01-10",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ReconstructionOf": "XYZ Park Reconstruction",
+      "Design": "Design-Build",
+      "ACCO_Name": "Agency Chief Contracting Officer",
+      "Article54_Invoked_Y": true,
+      "Article64_Termination_Y": true
+    }
+  },
+  "FORM-020": {
+    "pdf": "FORM-020_CONTRACTOR_CHANGE_ORDER_CHECKLIST.pdf",
+    "fields": {
+      "Labor_TradeClassifications": "Foreman – Plumber; 1010 Laborer",
+      "WageRate_Source": "NYC Comptroller",
+      "RSMeans_Reference": "Yes",
+      "Equipment_RentedQuotes_Attached": true,
+      "Equipment_OwnedRate_Method": "75% AED/BlueBook",
+      "Overtime_Premium_NoMarkup": true
+    }
+  },
+  "FORM-021": {
+    "pdf": "FORM-021_CO_CHECKLIST_FOR_RE.pdf",
+    "fields": {
+      "Has_DPR_Directive": true,
+      "Has_Contractor_Proposal": true,
+      "Has_Designer_Memo": true,
+      "Has_RE_Analysis": true,
+      "Has_RSMeans": true,
+      "Has_AED_GreenBook": true
+    }
+  },
+  "FORM-022A": {
+    "pdf": "FORM-022A_CHANGE_ORDER_FORM_1.pdf",
+    "fields": {
+      "Contractor_Agrees_BasisOfPayment": "Time & Material",
+      "Authorized_Cost": 250000,
+      "Forced_Change_Order_Y": false
+    }
+  },
+  "FORM-022B": {
+    "pdf": "FORM-022B_CHANGE_ORDER_FORM_2.pdf",
+    "fields": {
+      "ReasonForChange": "Field Change",
+      "AdminCode_6129_DueDiligence_Y": true,
+      "Design_Error_Over_3000_Notified_Y": false,
+      "Justification_Summary": "Nature/origin, scope, alternatives, attachments listed."
+    }
+  },
+  "FORM-022CO": {
+    "pdf": "FORM-022CO_CHANGE_ORDER_INFORMATION_SHEET.pdf",
+    "fields": {
+      "CCDs": 365,
+      "PercentComplete": 50,
+      "ScheduledCompletionDate": "2026-05-15",
+      "FundingSource": "City",
+      "ChangeOrderType": "EXTRA",
+      "Reason": "FIELD CONDITION",
+      "Requires_CORP_Review_Over_15000_Y": true
+    }
+  },
+  "FORM-022OU": {
+    "pdf": "FORM-022OU_OVERRUN_UNDERRUN.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "OverrunUnderrunNo": "OU-001",
+      "PercentComplete": 65,
+      "ContactPerson": "Alex Rodriguez, PE"
+    }
+  },
+  "FORM-023": {
+    "pdf": "FORM-023_CHANGE_ORDER_LOG.xlsx",
+    "fields": {}
+  },
+  "FORM-024": {
+    "pdf": "FORM-024_LAW_DEPT_CO_REVIEW.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ChangeOrderNo": "CO-123",
+      "Amount": 50000,
+      "Reason": "Design Omission",
+      "Recommendation": "No Recoupment"
+    }
+  },
+  "FORM-025": {
+    "pdf": "FORM-025_TM_DAILY_REPORT.xlsx",
+    "fields": {}
+  },
+  "FORM-026": {
+    "pdf": "FORM-026_TM_MONTHLY_LABOR_EQUIP.xlsx",
+    "fields": {}
+  },
+  "FORM-027": {
+    "pdf": "FORM-027_TM_MONTHLY_MATERIAL_COSTS.xlsx",
+    "fields": {}
+  },
+  "FORM-028": {
+    "pdf": "FORM-028_WAGE_RATE_BREAKDOWN.pdf",
+    "fields": {
+      "Contractor": "ACME Construction Corp",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Classification": "Plumber",
+      "BaseRate": 45,
+      "WelfareFund": 10
+    }
+  },
+  "FORM-029": {
+    "pdf": "FORM-029_CONTRACTOR_FINAL_COST_REQUEST.pdf",
+    "fields": {
+      "Date": "2025-12-31",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ItemsOutstanding": "Submit T&M tickets and invoices"
+    }
+  },
+  "FORM-030": {
+    "pdf": "FORM-030_PENCIL_COPY_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "PaymentNo": 5,
+      "ContractorRep": "Jane Smith",
+      "InsuranceCertificateOnFile": true,
+      "PrevailingWageAckOnFile": true
+    }
+  },
+  "FORM-032": {
+    "pdf": "FORM-032_PYMNT_INFO_AND_CONTRACTOR_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "PaymentNo": 6,
+      "PaymentType": "Partial",
+      "PeriodFrom": "2025-09-01",
+      "PeriodTo": "2025-09-30",
+      "ContractorRepName": "ACME Construction Corp Rep",
+      "ContractorRepTitle": "Project Manager",
+      "ContractorRepDate": "2025-10-01"
+    }
+  },
+  "FORM-033": {
+    "pdf": "FORM-033_FINAL_PAYMENT_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ContractorName": "ACME Construction Corp",
+      "SC_InspectionDate": "2025-09-27",
+      "SC_ReportDate": "2025-09-27",
+      "AllPunchItemsCleared_Y": true,
+      "PunchListClearLetterDate": "2025-10-20",
+      "CompletionCertificateOnFile_Y": true,
+      "TimeExtensionRequired_Y": false,
+      "UnitItemComputationsOnFile_Y": true,
+      "CO_Required_Y": false
+    }
+  },
+  "FORM-034": {
+    "pdf": "FORM-034_RESIDENT_ENGINEER_PAYMENT_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "PaymentNo": 6,
+      "PeriodFrom": "2025-09-01",
+      "PeriodTo": "2025-09-30",
+      "MathExtensionsChecked_Y": true,
+      "Forms39A39BChecked_Y": true,
+      "SubApprovalConfirmed_Y": true,
+      "SubForm40SCOnFile_Y": true,
+      "COsRegisteredWithComptroller_Y": true,
+      "InsuranceCurrentOnFile_Y": true,
+      "OverrunsNegotiated91_Y": true,
+      "PrevailingWage112OnFile_Y": true,
+      "StoredMaterialApprovalAttached_Y": true,
+      "TimeExtensionApprovedOnFile_Y": false,
+      "ResidentCertificationSignedOn_39_1_Y": true
+    }
+  },
+  "FORM-034A": {
+    "pdf": "FORM-034A_FHWA_SD0T_RESIDENT_PAYMENT_PROCESSING_CHECKLIST.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "PaymentNo": 6,
+      "PeriodFrom": "2025-09-01",
+      "PeriodTo": "2025-09-30",
+      "AAP_21LL_SubPromptPayment_Attached_Y": true,
+      "AAP_33LL_MonthlyWorkforce_Attached_Y": true,
+      "NYS_GCC1_MWBE_PaymentSummary_Attached_Y": true,
+      "MonthlyWorkforceUtilReport_Attached_Y": true
+    }
+  },
+  "FORM-035": {
+    "pdf": "FORM-035_PAYMENT_RETURNED_LETTER.pdf",
+    "fields": {
+      "Date": "2025-10-02",
+      "ContractNo": "Q-2025-XYZ-001",
+      "PaymentNo": 6,
+      "Reason1": "Missing notarized Form 42 (Certificate of Contractor to Comptroller)",
+      "ContactTitle": "Director/Resident Engineer",
+      "ContactPhone": "718-760-0000"
+    }
+  },
+  "FORM-036": {
+    "pdf": "FORM-036_ASSIGNMENT_OF_MONIES_LETTER.pdf",
+    "fields": {
+      "Date": "2025-10-03",
+      "ContractNo": "Q-2025-XYZ-001",
+      "RequestLetterDate": "2025-09-29",
+      "AssignAllMonies_Y": true,
+      "AssignAmount": 0,
+      "Assignee": "First National Bank, NY",
+      "SubmitTo": "Borough Supervisor / EAO / Office of the Comptroller / FMFO-P"
+    }
+  },
+  "FORM-037": {
+    "pdf": "FORM-037_CONTRACTOR_STORED_MATERIALS_REQUEST_LETTER.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "Supervisor": "John Director",
+      "StorageChoice": "OFFSITE",
+      "OffsiteLocation": "Secure Warehouse, 99 Storage Rd, Queens, NY",
+      "MarkingRequired_Text": "PROPERTY OF THE CITY OF NEW YORK",
+      "ListOfMaterialsAttached_Y": true,
+      "SupplierName": "NYC Supply Co.",
+      "TitleAssignmentFromContractor_Y": true,
+      "InsuredFullValue_Y": true,
+      "ContractorBearsRisk_Y": true,
+      "ReplaceIfLostOrDestroyed_Y": true,
+      "NotAcceptanceOfConformance_Y": true,
+      "PaySubWithin7Days_Y": true,
+      "CertTitleTransfersToCityOnApproval_Y": true
+    }
+  },
+  "FORM-038": {
+    "pdf": "FORM-038_STORED_MATERIALS_APPROVAL_LETTER.pdf",
+    "fields": {
+      "Date": "2025-10-03",
+      "ContractNo": "Q-2025-XYZ-001",
+      "Design": "Design-Build",
+      "Supervisor": "John Director",
+      "RequestLetterDate": "2025-09-29",
+      "StorageChoice": "OFFSITE",
+      "StorageLocation": "Secure Warehouse, 99 Storage Rd, Queens, NY",
+      "TotalValueStored": 125000,
+      "LessRetention15Pct": 18750,
+      "SuitablePayment": 106250,
+      "SupplierName": "NYC Supply Co.",
+      "AssignmentOnFile_Y": true,
+      "InsuranceProofOnFile_Y": true,
+      "ContractorBearsStorageCosts_Y": true,
+      "ReplaceIfLostDestroyed_Y": true,
+      "NotAcceptanceOfConformance_Y": true,
+      "PaySubWithin7Days_Y": true
+    }
+  },
+  "FORM-039A": {
+    "pdf": "FORM-039A_CONTRACT_WORK_REQUISITION_QUANTITY_BREAKDOWN.pdf",
+    "fields": {
+      "SheetNo": 1,
+      "OfSheets": 1,
+      "PaymentReqNo": 6,
+      "PaymentType": "Partial",
+      "PeriodFrom": "2025-09-01",
+      "PeriodTo": "2025-09-30",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "Borough": "Queens",
+      "JobDescription": "XYZ Park Reconstruction",
+      "ContractorName": "ACME Construction Corp",
+      "ContractorAddress": "123 Main Street, Queens, NY 11375",
+      "ContractorPhone": "718-555-1234",
+      "LineItemsCSV": "ItemNo,Description,EngEstUnits,PrevTotal,TotalToDate,BidUnitPrice,TotalCostToDate\n1,Excavation CY,1000,400,650,25.00,16250\n2,Concrete CY,500,200,300,180.00,54000",
+      "PageTotal": 70250
+    }
+  },
+  "FORM-039B": {
+    "pdf": "FORM-039B_CHANGE_ORDER_WORK_REQUISITION_SUMMARY.pdf",
+    "fields": {
+      "SheetNo": 1,
+      "OfSheets": 1,
+      "PaymentReqNo": 6,
+      "PaymentType": "Partial",
+      "PeriodFrom": "2025-09-01",
+      "PeriodTo": "2025-09-30",
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "Borough": "Queens",
+      "JobDescription": "XYZ Park Reconstruction",
+      "ContractorName": "ACME Construction Corp",
+      "ContractorAddress": "123 Main Street, Queens, NY 11375",
+      "ContractorPhone": "718-555-1234",
+      "ChangeOrdersJSON": "[{\"CONo\":\"CO-001\",\"Type\":\"Unit Cost\",\"DPRLetterDate\":\"2025-07-10\",\"Approved\":20000,\"PreviouslyBilled\":8000,\"TotalToDate\":12000},{\"CONo\":\"CO-002\",\"Type\":\"T&M\",\"DPRLetterDate\":\"2025-08-15\",\"Approved\":15000,\"PreviouslyBilled\":500,\"TotalToDate\":5500},{\"CONo\":\"CO-003\",\"Type\":\"Lump Sum\",\"DPRLetterDate\":\"2025-09-05\",\"Approved\":30000,\"PreviouslyBilled\":0,\"TotalToDate\":3000}]",
+      "SummaryTotals": 20500
+    }
+  },
+  "FORM-039-1": {
+    "pdf": "FORM-039-1_CONTRACTORS_PAYMENT_SUMMARY_CONTRACT_WORK.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "PaymentNo": 6,
+      "PaymentType": "Partial",
+      "a_CostContractWorkToDate": 1250000,
+      "b_StoredMaterialAmount": 106250,
+      "c_Total_a_plus_b": 1356250,
+      "d_RetainedPctAmount": 67812.5,
+      "e_TotalPreviouslyCertified": 1200000,
+      "f_LiquidatedDamages": 0,
+      "g_NetAmount_c_minus_d_minus_e_minus_f": 88769,
+      "h_LessAmountWithheld": 0,
+      "j_NetAmountDueThisEstimate": 87500,
+      "ContractorCompanyName": "ACME Construction Corp",
+      "ContractorPrintedName": "Jane Smith",
+      "ContractorTitle": "Project Manager",
+      "ContractorSignatureDate": "2025-10-03",
+      "RE_PrintedName": "Alex Rodriguez, PE",
+      "RE_Phone": "718-760-0000"
+    }
+  },
+  "FORM-039-2": {
+    "pdf": "FORM-039-2_CONTRACTORS_PAYMENT_SUMMARY_CHANGE_ORDER_ONLY.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "PaymentNo": 6,
+      "a_TotalCOCostToDate": 20500,
+      "b_RetainedPctAmount": 1025,
+      "c_TotalCOPreviouslyCertified": 5000,
+      "d_NetAmount_a_minus_b_minus_c": 14475,
+      "e_LessAmountWithheld": 0,
+      "f_Payment": 14475,
+      "ContractorSignatureDate": "2025-10-03",
+      "ContractorTitle": "Project Manager",
+      "ContractorCompanyName": "ACME Construction Corp",
+      "RE_SignatureDate": "2025-10-03"
+    }
+  },
+  "FORM-040SC": {
+    "pdf": "FORM-040SC_LABOR_PROVISION_CERTIFICATION.pdf",
+    "fields": {
+      "Date": "2025-10-03",
+      "SubcontractorName": "ABC Electrical LLC",
+      "ContractNumber": "Q-2025-XYZ-001",
+      "NonDiscrimination_Compliant_Y": true,
+      "MinimumWage_Compliant_Y": true,
+      "SignerName": "Maria Rodriguez",
+      "SignerTitle": "Officer"
+    }
+  },
+  "FORM-041": {
+    "pdf": "FORM-041_PAYROLL_REPORT.pdf",
+    "fields": {
+      "Agency": "NYC Parks",
+      "WeekEndingDate": "2025-09-26",
+      "ProjectNameAndLocation": "XYZ Park Reconstruction – Queens",
+      "PrimeContractorName": "ACME Construction Corp",
+      "ContractorOrSub": "Subcontractor",
+      "ContractRegistrationNo": "2025-000123",
+      "JobCode": "Q-XYZ-001",
+      "PayrollNo": 12,
+      "TaxId": "12-3456789",
+      "Address": "123 Main Street, Queens, NY 11375",
+      "Phone": "718-555-1234",
+      "EmployeeRowsCSV": "Name,Address,Last4SSN,Trade,Class,J/A/H,BaseRate,HoursRT,HoursOT,SuppBenefits,TotalBase,Gross,TotalDeductions,Net\nJohn Doe,111 Main St,1234,Plumber,Journey,J,45,40,5,10,2025,2250,600,1650",
+      "CertifierPrintedName": "Jane Smith",
+      "CertifierTitle": "Payroll Admin",
+      "CertificationDate": "2025-09-27"
+    }
+  },
+  "FORM-041-I": {
+    "pdf": "FORM-041-I_PAYROLL_REPORT_DOUBLE_SIDED_INSTRUCTIONS.pdf",
+    "fields": {
+      "AppliesToForm": "FORM-041",
+      "Step1_PrintPageFrom": "1 of 2",
+      "Step2_ManualFeedOrientationNote": "Face down; instruction header parallel to left guide",
+      "Step3_PrintSecondPageFrom": "2 of 2"
+    }
+  },
+  "FORM-042": {
+    "pdf": "FORM-042_CERTIFICATE_OF_CONTRACTOR_TO_COMPTROLLER.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ContractorCompanyName": "ACME Construction Corp",
+      "AmountsDueLaborCSV": "Name,Amount\nNone due to Laborers,0",
+      "AmountsDueMatSupCSV": "Name,Amount\nNone due to materialmen and supplymen,0",
+      "SubcontractorsCSV": "Subcontractor,Work\nNONE,",
+      "NotaryCounty": "Queens",
+      "NotaryDate": "2025-10-05",
+      "SignerTitle": "Officer"
+    }
+  },
+  "FORM-043": {
+    "pdf": "FORM-043_CERTIFICATE_OF_SUBCONTRACTOR_TO_COMPTROLLER.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "SubcontractorCompanyName": "ABC Electrical LLC",
+      "AmountsDueLaborCSV": "Name,Amount\nJohn Smith,1200",
+      "AmountsDueMatSupCSV": "Vendor,Amount\nNYC Supply Co.,4200",
+      "SubSubcontractorsCSV": "Firm,Work\nNONE,",
+      "NotaryCounty": "Queens",
+      "NotaryDate": "2025-10-05",
+      "SignerTitle": "Partner"
+    }
+  },
+  "FORM-044": {
+    "pdf": "FORM-044_SUBCONTRACTOR_COMPLIANCE_REPORT.pdf",
+    "fields": {
+      "ContractNo": "Q-2025-XYZ-001",
+      "ComptrollerNo": "C-000123",
+      "ContractValue": 5000000,
+      "MWBE_Goal_DollarValue": 1000000,
+      "CompanyName": "ACME Construction Corp",
+      "ContactPerson": "Jane Smith",
+      "EIN_SSN": "12-3456789",
+      "RequisitionNumber": "Partial-006",
+      "NetRequisitionThisPayment": 87500,
+      "PaymentPeriod_From": "2025-09-01",
+      "PaymentPeriod_To": "2025-09-30",
+      "Email": "ap@contractor.com",
+      "Phone": "718-555-1234",
+      "Fax": "718-555-3434",
+      "SubsJSON": "[{\"Name\":\"ABC Electrical LLC\",\"EIN\":\"11-1111111\",\"MWBE\":\"M/WBE\",\"Ethnicity\":\"Hisp.\",\"SAF_Estimate\":250000,\"Trade\":\"Electrical\",\"PrevPaid\":80000,\"DueThisPeriod\":15000,\"Total\":95000,\"Status\":\"Ongoing\"},{\"Name\":\"XYZ Masonry Inc.\",\"EIN\":\"22-2222222\",\"MWBE\":\"N/A\",\"Ethnicity\":\"N/A\",\"SAF_Estimate\":300000,\"Trade\":\"Masonry\",\"PrevPaid\":120000,\"DueThisPeriod\":20000,\"Total\":140000,\"Status\":\"Ongoing\"}]",
+      "CertifierName": "Jane Smith",
+      "CertifierTitle": "Project Manager",
+      "CertifyDate": "2025-10-03"
+    }
+  },
+  "FORM-045": {
+    "pdf": "FORM-045_OMB_FINAL_PAYMENT_MEMORANDUM.pdf",
+    "fields": {
+      "To": "Audit",
+      "From": "Alex Rodriguez, PE",
+      "Date": "2025-10-06",
+      "Subject": "Open Market Bid Proposal No. OMBP-(12345)",
+      "Contractor": "ACME Construction Corp",
+      "Supervision": "John Director",
+      "SC_InspectionDate": "2025-09-27",
+      "SC_Attendees": "RE, Contractor PM, Inspector",
+      "TotalCompletionDate": "2025-10-02",
+      "FinalPaymentNo": 7,
+      "FinalPaymentAmount": 125000,
+      "ReviewedBy": "Construction Division",
+      "SubmitTo": "FMFO; Borough Director; Project Management; Engineering Audit"
+    }
+  }
+}

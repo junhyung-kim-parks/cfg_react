@@ -1,0 +1,24 @@
+{
+  "user": {
+    "id": "user-001",
+    "name": "John Doe",
+    "email": "john.doe@parks.nyc.gov",
+    "role": "Admin",
+    "status": "Active",
+    "permissions": {
+      "form_generate": true,
+      "form_modify_templates": true,
+      "form_upload_templates": true,
+      "form_batch_process": true,
+      "user_management": true,
+      "audit_logs": true,
+      "settings": true
+    },
+    "lastLogin": "2025-01-15T14:30:22Z",
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2025-01-15T14:30:22Z",
+    "department": "NYC Parks & Recreation",
+    "phone": "+1 (555) 0123"
+  },
+  "message": "Token is valid"
+}

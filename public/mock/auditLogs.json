@@ -1,0 +1,202 @@
+{
+  "logs": [
+    {
+      "id": "audit-001",
+      "timestamp": "2025-01-15T14:30:22Z",
+      "user": {
+        "name": "John Doe",
+        "email": "john.doe@parks.nyc.gov"
+      },
+      "action": "Form Template Updated",
+      "actionType": "form_template_updated",
+      "target": "FORM-001",
+      "details": "Updated field mapping for ContractorName",
+      "ipAddress": "192.168.1.100"
+    },
+    {
+      "id": "audit-002",
+      "timestamp": "2025-01-15T13:15:45Z",
+      "user": {
+        "name": "Jane Smith",
+        "email": "jane.smith@parks.nyc.gov"
+      },
+      "action": "Form Generated",
+      "actionType": "form_generated",
+      "target": "FORM-022A",
+      "details": "Generated for contract Q123-456M",
+      "ipAddress": "192.168.1.101"
+    },
+    {
+      "id": "audit-003",
+      "timestamp": "2025-01-15T11:22:18Z",
+      "user": {
+        "name": "Admin User",
+        "email": "admin@parks.nyc.gov"
+      },
+      "action": "Form Library Upload",
+      "actionType": "form_library_upload",
+      "target": "FORM-120A",
+      "details": "Uploaded new template file",
+      "ipAddress": "192.168.1.102"
+    },
+    {
+      "id": "audit-004",
+      "timestamp": "2025-01-15T09:45:33Z",
+      "user": {
+        "name": "Mike Johnson",
+        "email": "mike.johnson@parks.nyc.gov"
+      },
+      "action": "User Permission Updated",
+      "actionType": "user_permission_updated",
+      "target": "jane.smith@parks.nyc.gov",
+      "details": "Changed role from Viewer to Editor",
+      "ipAddress": "192.168.1.103"
+    },
+    {
+      "id": "audit-005",
+      "timestamp": "2025-01-14T16:12:07Z",
+      "user": {
+        "name": "Sarah Wilson",
+        "email": "sarah.wilson@parks.nyc.gov"
+      },
+      "action": "Batch Processing Completed",
+      "actionType": "batch_processing_completed",
+      "target": "Multiple Forms",
+      "details": "Processed 25 forms for project batch upload",
+      "ipAddress": "192.168.1.104"
+    },
+    {
+      "id": "audit-006",
+      "timestamp": "2025-01-14T15:30:22Z",
+      "user": {
+        "name": "Robert Chen",
+        "email": "robert.chen@parks.nyc.gov"
+      },
+      "action": "Field Mapping Updated",
+      "actionType": "field_mapping_updated",
+      "target": "FORM-033",
+      "details": "Updated ContractorCompanyName field validation rules",
+      "ipAddress": "192.168.1.105"
+    },
+    {
+      "id": "audit-007",
+      "timestamp": "2025-01-14T14:18:41Z",
+      "user": {
+        "name": "Lisa Rodriguez",
+        "email": "lisa.rodriguez@parks.nyc.gov"
+      },
+      "action": "Form Generated",
+      "actionType": "form_generated",
+      "target": "FORM-011",
+      "details": "Generated weekly progress report #12",
+      "ipAddress": "192.168.1.106"
+    },
+    {
+      "id": "audit-008",
+      "timestamp": "2025-01-14T12:45:55Z",
+      "user": {
+        "name": "David Park",
+        "email": "david.park@parks.nyc.gov"
+      },
+      "action": "Template Deleted",
+      "actionType": "template_deleted",
+      "target": "FORM-OLD-001",
+      "details": "Removed deprecated template version",
+      "ipAddress": "192.168.1.107"
+    },
+    {
+      "id": "audit-009",
+      "timestamp": "2025-01-14T10:22:13Z",
+      "user": {
+        "name": "Emma Thompson",
+        "email": "emma.thompson@parks.nyc.gov"
+      },
+      "action": "User Login",
+      "actionType": "user_login",
+      "target": "System",
+      "details": "Successful login from Chrome browser",
+      "ipAddress": "192.168.1.108"
+    },
+    {
+      "id": "audit-010",
+      "timestamp": "2025-01-14T08:00:00Z",
+      "user": {
+        "name": "System",
+        "email": "system@parks.nyc.gov"
+      },
+      "action": "System Backup",
+      "actionType": "system_backup",
+      "target": "Database",
+      "details": "Daily automated backup completed successfully",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "audit-011",
+      "timestamp": "2025-01-13T17:35:28Z",
+      "user": {
+        "name": "Alex Martinez",
+        "email": "alex.martinez@parks.nyc.gov"
+      },
+      "action": "Form Template Updated",
+      "actionType": "form_template_updated",
+      "target": "FORM-039A",
+      "details": "Updated quantity breakdown calculation formulas",
+      "ipAddress": "192.168.1.109"
+    },
+    {
+      "id": "audit-012",
+      "timestamp": "2025-01-13T16:20:15Z",
+      "user": {
+        "name": "Maria Gonzalez",
+        "email": "maria.gonzalez@parks.nyc.gov"
+      },
+      "action": "Form Library Upload",
+      "actionType": "form_library_upload",
+      "target": "FORM-045A",
+      "details": "Uploaded revised payment memorandum template",
+      "ipAddress": "192.168.1.110"
+    },
+    {
+      "id": "audit-013",
+      "timestamp": "2025-01-13T15:12:42Z",
+      "user": {
+        "name": "James Wilson",
+        "email": "james.williams@parks.nyc.gov"
+      },
+      "action": "Batch Processing Completed",
+      "actionType": "batch_processing_completed",
+      "target": "Contract Q-2025-XYZ-001",
+      "details": "Processed 12 forms for project initialization",
+      "ipAddress": "192.168.1.111"
+    },
+    {
+      "id": "audit-014",
+      "timestamp": "2025-01-13T13:50:17Z",
+      "user": {
+        "name": "Sandra Lee",
+        "email": "sandra.lee@parks.nyc.gov"
+      },
+      "action": "User Permission Updated",
+      "actionType": "user_permission_updated",
+      "target": "robert.chen@parks.nyc.gov",
+      "details": "Added Form Library Admin permissions",
+      "ipAddress": "192.168.1.112"
+    },
+    {
+      "id": "audit-015",
+      "timestamp": "2025-01-13T11:33:08Z",
+      "user": {
+        "name": "Kevin Brown",
+        "email": "kevin.brown@parks.nyc.gov"
+      },
+      "action": "Form Generated",
+      "actionType": "form_generated",
+      "target": "FORM-041",
+      "details": "Generated payroll report for week ending 2025-01-10",
+      "ipAddress": "192.168.1.113"
+    }
+  ],
+  "total": 15,
+  "page": 1,
+  "pageSize": 50
+}
