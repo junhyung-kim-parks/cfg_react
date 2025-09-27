@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Upload, Filter, MoreVertical, Edit, Save, X, FileText, Hash, Calendar, CheckSquare } from 'lucide-react';
+import { Search, Upload, Filter, MoreVertical, Edit, Save, X, FileText, Hash, Calendar, CheckSquare, Plus, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -10,13 +10,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '../components/ui/sheet';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Separator } from '../components/ui/separator';
-import { list as getFormList } from '../features/forms/services/forms.service';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
+import { Progress } from '../components/ui/progress';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Textarea } from '../components/ui/textarea';
+import { list as getFormList, uploadTemplate } from '../features/forms/services/forms.service';
 import { formFieldMappingsService } from '../features/forms/services/formFieldMappings.service';
 import type { FormItem } from '../features/forms/types';
 
 interface FormFieldMapping {
   pdf: string;
   fields: Record<string, any>;
+}
+
+interface NewTemplateData {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  templateType: 'PDF' | 'EXCEL' | 'WORD';
+  file: File | null;
+}
+
+interface FieldDefinition {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'date';
 }
 
 export function FormLibraryPage() {
@@ -30,8 +48,22 @@ export function FormLibraryPage() {
   const [isFieldEditorOpen, setIsFieldEditorOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState<FormItem | null>(null);
   const [formMapping, setFormMapping] = useState<FormFieldMapping | null>(null);
-  const [editedFields, setEditedFields] = useState<Record<string, any>>({});
+  const [fieldDefinitions, setFieldDefinitions] = useState<FieldDefinition[]>([]);
   const [loadingMapping, setLoadingMapping] = useState(false);
+
+  // Upload Template State
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [uploadData, setUploadData] = useState<NewTemplateData>({
+    id: '',
+    title: '',
+    category: '',
+    description: '',
+    templateType: 'PDF',
+    file: null
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     loadForms();
@@ -103,94 +135,262 @@ export function FormLibraryPage() {
       
       if (mapping) {
         setFormMapping(mapping);
-        setEditedFields({ ...mapping.fields });
+        // Convert existing fields to field definitions
+        const definitions: FieldDefinition[] = Object.entries(mapping.fields).map(([name, value]) => ({
+          name,
+          type: getFieldType(value)
+        }));
+        setFieldDefinitions(definitions);
       } else {
         setFormMapping(null);
-        setEditedFields({});
+        setFieldDefinitions([]);
       }
     } catch (error) {
       console.error('Failed to load form mapping:', error);
       setFormMapping(null);
-      setEditedFields({});
+      setFieldDefinitions([]);
     } finally {
       setLoadingMapping(false);
     }
   };
 
-  const handleFieldChange = (fieldName: string, value: any) => {
-    setEditedFields(prev => ({
-      ...prev,
-      [fieldName]: value
-    }));
+  const getFieldType = (value: any): 'string' | 'number' | 'boolean' | 'date' => {
+    if (typeof value === 'boolean') return 'boolean';
+    if (typeof value === 'number') return 'number';
+    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) return 'date';
+    return 'string';
+  };
+
+  const handleFieldNameChange = (index: number, newName: string) => {
+    setFieldDefinitions(prev => prev.map((field, i) => 
+      i === index ? { ...field, name: newName } : field
+    ));
+  };
+
+  const handleFieldTypeChange = (index: number, newType: 'string' | 'number' | 'boolean' | 'date') => {
+    setFieldDefinitions(prev => prev.map((field, i) => 
+      i === index ? { ...field, type: newType } : field
+    ));
+  };
+
+  const handleAddField = () => {
+    setFieldDefinitions(prev => [...prev, { name: '', type: 'string' }]);
+  };
+
+  const handleRemoveField = (index: number) => {
+    setFieldDefinitions(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSaveFields = () => {
     // In a real application, this would save to the backend
-    console.log('Saving fields for', selectedForm?.id, ':', editedFields);
+    console.log('Saving field definitions for', selectedForm?.id, ':', fieldDefinitions);
     
     // Update the form mapping
     if (formMapping) {
+      // Convert field definitions back to fields object with default values
+      const newFields: Record<string, any> = {};
+      fieldDefinitions.forEach(field => {
+        if (field.name.trim()) {
+          switch (field.type) {
+            case 'boolean':
+              newFields[field.name] = false;
+              break;
+            case 'number':
+              newFields[field.name] = 0;
+              break;
+            case 'date':
+              newFields[field.name] = new Date().toISOString().split('T')[0];
+              break;
+            default:
+              newFields[field.name] = '';
+          }
+        }
+      });
+
       setFormMapping({
         ...formMapping,
-        fields: editedFields
+        fields: newFields
       });
     }
     
     // Show success message (in a real app, you'd use a toast)
-    alert('Fields saved successfully!');
+    alert('Field definitions saved successfully!');
   };
 
   const handleCloseEditor = () => {
     setIsFieldEditorOpen(false);
     setSelectedForm(null);
     setFormMapping(null);
-    setEditedFields({});
+    setFieldDefinitions([]);
   };
 
-  const getFieldIcon = (value: any) => {
-    if (typeof value === 'boolean') return CheckSquare;
-    if (typeof value === 'number') return Hash;
-    if (typeof value === 'string' && value.includes('-') && value.length === 10) return Calendar;
-    return FileText;
+  // Upload functions
+  const handleOpenUploadDialog = () => {
+    setIsUploadDialogOpen(true);
+    setUploadData({
+      id: '',
+      title: '',
+      category: '',
+      description: '',
+      templateType: 'PDF',
+      file: null
+    });
+    setUploadError(null);
+    setUploadProgress(0);
   };
 
-  const renderFieldInput = (fieldName: string, value: any) => {
-    if (typeof value === 'boolean') {
-      return (
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id={fieldName}
-            checked={editedFields[fieldName] || false}
-            onCheckedChange={(checked) => handleFieldChange(fieldName, checked)}
-          />
-          <Label htmlFor={fieldName} className="text-sm font-normal">
-            {editedFields[fieldName] ? 'Yes' : 'No'}
-          </Label>
-        </div>
-      );
-    }
+  const handleReplaceTemplate = () => {
+    if (!selectedForm) return;
     
-    if (typeof value === 'number') {
-      return (
-        <Input
-          type="number"
-          value={editedFields[fieldName] || ''}
-          onChange={(e) => handleFieldChange(fieldName, Number(e.target.value))}
-          className="text-sm"
-        />
-      );
-    }
-    
-    return (
-      <Input
-        type="text"
-        value={editedFields[fieldName] || ''}
-        onChange={(e) => handleFieldChange(fieldName, e.target.value)}
-        className="text-sm"
-        placeholder={`Enter ${fieldName}`}
-      />
-    );
+    setIsUploadDialogOpen(true);
+    setUploadData({
+      id: selectedForm.id,
+      title: selectedForm.title,
+      category: selectedForm.category,
+      description: selectedForm.description || '',
+      templateType: selectedForm.templateType || 'PDF',
+      file: null
+    });
+    setUploadError(null);
+    setUploadProgress(0);
   };
+
+  const handleCloseUploadDialog = () => {
+    if (isUploading) return; // Prevent closing during upload
+    setIsUploadDialogOpen(false);
+    setUploadData({
+      id: '',
+      title: '',
+      category: '',
+      description: '',
+      templateType: 'PDF',
+      file: null
+    });
+    setUploadError(null);
+    setUploadProgress(0);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = {
+      'PDF': ['application/pdf'],
+      'EXCEL': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'],
+      'WORD': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']
+    };
+
+    const fileType = file.type;
+    let detectedType: 'PDF' | 'EXCEL' | 'WORD' = 'PDF';
+
+    if (validTypes.PDF.includes(fileType)) {
+      detectedType = 'PDF';
+    } else if (validTypes.EXCEL.includes(fileType)) {
+      detectedType = 'EXCEL';
+    } else if (validTypes.WORD.includes(fileType)) {
+      detectedType = 'WORD';
+    }
+
+    setUploadData(prev => ({
+      ...prev,
+      file,
+      templateType: detectedType,
+      // Auto-generate ID from filename if empty
+      id: prev.id || file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '_').toUpperCase(),
+      // Auto-generate title from filename if empty  
+      title: prev.title || file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ')
+    }));
+    setUploadError(null);
+  };
+
+  const handleUploadDataChange = (field: keyof NewTemplateData, value: string) => {
+    setUploadData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const validateUploadData = (): string | null => {
+    if (!uploadData.file) return 'Please select a file to upload';
+    if (!uploadData.id.trim()) return 'Template ID is required';
+    if (!uploadData.title.trim()) return 'Template title is required';
+    if (!uploadData.category.trim()) return 'Category is required';
+    
+    // Check if ID already exists (only for new templates, not replacements)
+    const isReplacement = selectedForm && selectedForm.id === uploadData.id;
+    if (!isReplacement && forms.some(form => form.id.toLowerCase() === uploadData.id.toLowerCase())) {
+      return 'A template with this ID already exists';
+    }
+
+    return null;
+  };
+
+  const handleUploadTemplate = async () => {
+    const validationError = validateUploadData();
+    if (validationError) {
+      setUploadError(validationError);
+      return;
+    }
+
+    if (!uploadData.file) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+    setUploadProgress(0);
+
+    // Determine if this is a replacement operation
+    const isReplacement = selectedForm && selectedForm.id === uploadData.id;
+
+    try {
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      // Call upload service
+      const newForm = await uploadTemplate({
+        id: uploadData.id,
+        title: uploadData.title,
+        category: uploadData.category,
+        description: uploadData.description,
+        templateType: uploadData.templateType,
+        file: uploadData.file
+      });
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      // Add to forms list or replace existing
+      if (isReplacement) {
+        setForms(prev => prev.map(form => 
+          form.id === uploadData.id ? newForm : form
+        ));
+      } else {
+        setForms(prev => [newForm, ...prev]);
+      }
+      
+      // Show success message
+      alert(isReplacement ? 'Template replaced successfully!' : 'Template uploaded successfully!');
+      
+      // Close dialog
+      handleCloseUploadDialog();
+
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setUploadError(error instanceof Error ? error.message : 'Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+
 
   if (loading) {
     return (
@@ -241,7 +441,10 @@ export function FormLibraryPage() {
           </div>
 
           {/* Upload Button */}
-          <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
+          <Button 
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+            onClick={handleOpenUploadDialog}
+          >
             <Upload className="h-4 w-4" />
             Upload New Template
           </Button>
@@ -327,7 +530,10 @@ export function FormLibraryPage() {
               : 'Get started by uploading your first template.'}
           </p>
           {(!searchQuery && selectedCategory === 'All Categories') && (
-            <Button className="bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={handleOpenUploadDialog}
+            >
               <Upload className="h-4 w-4 mr-2" />
               Upload New Template
             </Button>
@@ -337,19 +543,30 @@ export function FormLibraryPage() {
 
       {/* Field Editor Side Panel */}
       <Sheet open={isFieldEditorOpen} onOpenChange={setIsFieldEditorOpen}>
-        <SheetContent className="w-[500px] sm:w-[600px]">
+        <SheetContent className="w-[600px] sm:w-[800px] max-w-[90vw]">
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Edit className="h-5 w-5 text-green-600" />
-              Edit Form Fields
-            </SheetTitle>
-            <SheetDescription>
-              {selectedForm && (
-                <>
-                  Edit field mappings for <strong>{selectedForm.id}</strong> - {selectedForm.title}
-                </>
-              )}
-            </SheetDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <SheetTitle className="flex items-center gap-2">
+                  <Edit className="h-5 w-5 text-green-600" />
+                  Edit Form Fields
+                </SheetTitle>
+                <SheetDescription>
+                  {selectedForm && (
+                    <>
+                      Edit field mappings for <strong>{selectedForm.id}</strong> - {selectedForm.title}
+                    </>
+                  )}
+                </SheetDescription>
+              </div>
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 shrink-0"
+                onClick={handleReplaceTemplate}
+              >
+                <Upload className="h-4 w-4" />
+                Upload New Template
+              </Button>
+            </div>
           </SheetHeader>
 
           <div className="flex-1 py-6">
@@ -358,7 +575,7 @@ export function FormLibraryPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
               </div>
             ) : formMapping ? (
-              <ScrollArea className="h-[calc(100vh-200px)]">
+              <ScrollArea className="h-[calc(100vh-250px)]">
                 <div className="space-y-4 pr-4">
                   {/* PDF Template Info */}
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -373,35 +590,99 @@ export function FormLibraryPage() {
 
                   {/* Form Fields */}
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                      <Hash className="h-4 w-4" />
-                      Form Fields ({Object.keys(editedFields).length})
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                        <Hash className="h-4 w-4" />
+                        Form Fields ({fieldDefinitions.length})
+                      </h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleAddField}
+                        className="flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Field
+                      </Button>
+                    </div>
                     
-                    {Object.keys(editedFields).length > 0 ? (
-                      <div className="space-y-4">
-                        {Object.entries(editedFields).map(([fieldName, value]) => {
-                          const FieldIcon = getFieldIcon(value);
+                    {fieldDefinitions.length > 0 ? (
+                      <div className="space-y-3">
+                        {fieldDefinitions.map((field, index) => {
+                          const getTypeIcon = (type: string) => {
+                            switch (type) {
+                              case 'boolean': return CheckSquare;
+                              case 'number': return Hash;
+                              case 'date': return Calendar;
+                              default: return FileText;
+                            }
+                          };
+                          const TypeIcon = getTypeIcon(field.type);
+                          
                           return (
-                            <div key={fieldName} className="border rounded-lg p-4 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <FieldIcon className="h-4 w-4 text-gray-500" />
-                                <Label className="text-sm font-medium text-gray-700">
-                                  {fieldName}
-                                </Label>
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-xs ml-auto"
-                                >
-                                  {typeof value}
-                                </Badge>
-                              </div>
-                              
-                              {renderFieldInput(fieldName, value)}
-                              
-                              {/* Current Value Display */}
-                              <div className="text-xs text-gray-500">
-                                Current: {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
+                            <div key={index} className="border rounded-lg p-4 space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                  <Label className="text-xs text-gray-600">Field Name</Label>
+                                  <Input
+                                    value={field.name}
+                                    onChange={(e) => handleFieldNameChange(index, e.target.value)}
+                                    placeholder="Enter field name"
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-xs text-gray-600">Data Type</Label>
+                                  <div className="flex gap-2">
+                                    <Select 
+                                      value={field.type} 
+                                      onValueChange={(value: 'string' | 'number' | 'boolean' | 'date') => 
+                                        handleFieldTypeChange(index, value)
+                                      }
+                                    >
+                                      <SelectTrigger className="text-sm">
+                                        <div className="flex items-center gap-2">
+                                          <TypeIcon className="h-3 w-3" />
+                                          <SelectValue />
+                                        </div>
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="string">
+                                          <div className="flex items-center gap-2">
+                                            <FileText className="h-3 w-3" />
+                                            Text
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="number">
+                                          <div className="flex items-center gap-2">
+                                            <Hash className="h-3 w-3" />
+                                            Number
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="boolean">
+                                          <div className="flex items-center gap-2">
+                                            <CheckSquare className="h-3 w-3" />
+                                            Boolean
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="date">
+                                          <div className="flex items-center gap-2">
+                                            <Calendar className="h-3 w-3" />
+                                            Date
+                                          </div>
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleRemoveField(index)}
+                                      className="px-2 hover:bg-red-50 hover:border-red-200"
+                                    >
+                                      <X className="h-3 w-3 text-red-500" />
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           );
@@ -410,7 +691,16 @@ export function FormLibraryPage() {
                     ) : (
                       <div className="text-center py-8 text-gray-500">
                         <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                        <p className="text-sm">No field mappings found for this form</p>
+                        <p className="text-sm">No fields defined for this form</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleAddField}
+                          className="mt-2"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add First Field
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -438,7 +728,7 @@ export function FormLibraryPage() {
             </Button>
             <Button 
               onClick={handleSaveFields}
-              disabled={!formMapping || Object.keys(editedFields).length === 0}
+              disabled={!formMapping || fieldDefinitions.length === 0}
               className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
@@ -447,6 +737,190 @@ export function FormLibraryPage() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      {/* Upload Template Dialog */}
+      <Dialog open={isUploadDialogOpen} onOpenChange={handleCloseUploadDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-green-600" />
+              {uploadData.id && forms.some(f => f.id === uploadData.id) ? 'Replace Template' : 'Upload New Template'}
+            </DialogTitle>
+            <DialogDescription>
+              {uploadData.id && forms.some(f => f.id === uploadData.id) 
+                ? `Replace the existing template "${uploadData.id}" with a new file.`
+                : 'Upload a new form template. Supports PDF, Word, and Excel files.'
+              }
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* File Upload */}
+            <div className="space-y-2">
+              <Label>Template File</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors">
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="template-file"
+                  disabled={isUploading}
+                />
+                <label htmlFor="template-file" className="cursor-pointer">
+                  {uploadData.file ? (
+                    <div className="space-y-2">
+                      <FileText className="h-8 w-8 mx-auto text-green-600" />
+                      <p className="text-sm font-medium text-gray-900">{uploadData.file.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {(uploadData.file.size / 1024 / 1024).toFixed(2)} MB • {uploadData.templateType}
+                      </p>
+                      <Button variant="outline" size="sm" type="button">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Change File
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Upload className="h-8 w-8 mx-auto text-gray-400" />
+                      <p className="text-sm text-gray-600">Click to select a file or drag and drop</p>
+                      <p className="text-xs text-gray-500">PDF, Word, or Excel files up to 10MB</p>
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            {/* Template Details */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="template-id">Template ID *</Label>
+                <Input
+                  id="template-id"
+                  value={uploadData.id}
+                  onChange={(e) => handleUploadDataChange('id', e.target.value)}
+                  placeholder="e.g., PERMIT_APPLICATION_2024"
+                  disabled={isUploading || (selectedForm && selectedForm.id === uploadData.id)}
+                  className={selectedForm && selectedForm.id === uploadData.id ? 'bg-gray-50 text-gray-500' : ''}
+                />
+                {selectedForm && selectedForm.id === uploadData.id && (
+                  <p className="text-xs text-gray-500">ID cannot be changed when replacing an existing template</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="template-type">Template Type</Label>
+                <Select 
+                  value={uploadData.templateType} 
+                  onValueChange={(value: 'PDF' | 'EXCEL' | 'WORD') => handleUploadDataChange('templateType', value)}
+                  disabled={isUploading}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PDF">PDF</SelectItem>
+                    <SelectItem value="WORD">Word Document</SelectItem>
+                    <SelectItem value="EXCEL">Excel Spreadsheet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="template-title">Template Title *</Label>
+              <Input
+                id="template-title"
+                value={uploadData.title}
+                onChange={(e) => handleUploadDataChange('title', e.target.value)}
+                placeholder="e.g., Park Event Permit Application"
+                disabled={isUploading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="template-category">Category *</Label>
+              <Select 
+                value={uploadData.category} 
+                onValueChange={(value) => handleUploadDataChange('category', value)}
+                disabled={isUploading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getCategories().filter(cat => cat !== 'All Categories').map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="General">General</SelectItem>
+                  <SelectItem value="Parks">Parks</SelectItem>
+                  <SelectItem value="Permits">Permits</SelectItem>
+                  <SelectItem value="Maintenance">Maintenance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="template-description">Description</Label>
+              <Textarea
+                id="template-description"
+                value={uploadData.description}
+                onChange={(e) => handleUploadDataChange('description', e.target.value)}
+                placeholder="Brief description of this template..."
+                rows={3}
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Upload Progress */}
+            {isUploading && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span>Uploading template...</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <Progress value={uploadProgress} />
+              </div>
+            )}
+
+            {/* Error Display */}
+            {uploadError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{uploadError}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={handleCloseUploadDialog}
+              disabled={isUploading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleUploadTemplate}
+              disabled={isUploading || !uploadData.file}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Template
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

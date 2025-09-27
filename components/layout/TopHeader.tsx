@@ -44,8 +44,8 @@ export function TopHeader() {
             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
               <Building2 className="h-4 w-4 text-green-600" />
               <div className="text-sm">
-                <p className="text-green-800 font-medium">{selectedProject.name}</p>
-                <p className="text-green-600 text-xs">{selectedProject.location}</p>
+                <p className="text-green-800 font-medium">{selectedProject.pl_short_description}</p>
+                <p className="text-green-600 text-xs">{selectedProject.pl_park_name}</p>
               </div>
               <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">
                 Selected

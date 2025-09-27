@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination';
 import { ProjectsService } from '../features/projects/services/projects.service';
 import { useProject } from '../contexts/ProjectContext';
 import { useFormGenerator } from '../contexts/FormGeneratorContext';
@@ -20,6 +21,8 @@ export function ProjectSearchPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const hasMounted = useRef(false);
 
   // Set current step when component mounts
@@ -37,25 +40,40 @@ export function ProjectSearchPage() {
     // Active includes: Design, Procurement, Construction, Active
     const activeStatuses = ['design', 'procurement', 'construction', 'active'];
     const active = projectList.filter(p => 
-      activeStatuses.includes(p.status.toLowerCase())
+      activeStatuses.includes(p.pi_park_contract_status.toLowerCase())
     ).length;
     
     const completed = projectList.filter(p => 
-      p.status.toLowerCase() === 'completed'
+      p.pi_park_contract_status.toLowerCase() === 'completed'
     ).length;
     
     const planning = projectList.filter(p => 
-      p.status.toLowerCase() === 'planning'
+      p.pi_park_contract_status.toLowerCase() === 'planning'
     ).length;
     
-    const totalBudget = projectList.reduce((sum, p) => sum + (p.budget || 0), 0);
-    const totalSpent = projectList.reduce((sum, p) => sum + (p.spent || 0), 0);
+    const design = projectList.filter(p => 
+      p.pi_park_contract_status.toLowerCase() === 'design'
+    ).length;
+    
+    const construction = projectList.filter(p => 
+      p.pi_park_contract_status.toLowerCase() === 'construction'
+    ).length;
+    
+    const procurement = projectList.filter(p => 
+      p.pi_park_contract_status.toLowerCase() === 'procurement'
+    ).length;
+    
+    const totalBudget = projectList.reduce((sum, p) => sum + (p.pi_total_project_funding_amount || 0), 0);
+    const totalSpent = projectList.reduce((sum, p) => sum + (p.pi_registration_amount || 0), 0);
     
     return {
       total,
       active,
       completed,
       planning,
+      design,
+      construction,
+      procurement,
       totalBudget,
       totalSpent
     };
@@ -78,6 +96,9 @@ export function ProjectSearchPage() {
             active: 0,
             completed: 0,
             planning: 0,
+            design: 0,
+            construction: 0,
+            procurement: 0,
             totalBudget: 0,
             totalSpent: 0
           });
@@ -99,6 +120,9 @@ export function ProjectSearchPage() {
           active: 0,
           completed: 0,
           planning: 0,
+          design: 0,
+          construction: 0,
+          procurement: 0,
           totalBudget: 0,
           totalSpent: 0
         });
@@ -113,6 +137,9 @@ export function ProjectSearchPage() {
 
   useEffect(() => {
     async function handleSearch() {
+      // Reset to first page when search changes
+      setCurrentPage(1);
+      
       if (searchTerm.trim() === '') {
         setFilteredProjects(projects);
         // Reset stats to all projects when no search
@@ -130,10 +157,12 @@ export function ProjectSearchPage() {
         console.error('ProjectSearchPage: Search failed:', error);
         // Fallback to client-side filtering
         const filtered = projects.filter(project =>
-          project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          project.manager.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          project.type.toLowerCase().includes(searchTerm.toLowerCase())
+          project.pi_short_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.pi_park_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.pi_managing_design_team_unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.pi_managing_construction_team_unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.pi_project_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.pi_park_contract_no.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredProjects(filtered);
         // Calculate stats from client-side filtered results
@@ -170,19 +199,47 @@ export function ProjectSearchPage() {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
+  const getUnitColor = (unit: string) => {    
+    // Color coding for design/construction units
+    switch (unit?.toLowerCase()) {
+      case 'architecture':
+      case 'engineering':
+          return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'bronx':
+      case 'brooklyn':
+      case 'queens':
+          return 'bg-green-100 text-green-800 border-green-200';
+      case 'staten island':
+          return 'bg-cyan-100 text-cyan-800 border-cyan-200';
+      case 'manhattan':
+          return 'bg-yellow-100 text-yellow-800 border-yellow-200';  
+      case 'building construction unit':
+      case 'environmental remediation unit':
+      case 'construction quality assurance':        
+          return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'forestry horticulture natural resources':
+      case 'natural resources group':
+          return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'historic houses':
+      case 'capital partner projects':
+      case 'capital projects':
+      case 'green thumb':
+          return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      case 'technical services':
+          return 'bg-pink-100 text-pink-800 border-pink-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+          return 'bg-gray-100 text-gray-800 border-gray-200';
     }
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageProjects = filteredProjects.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleProjectSelect = (project: Project) => {
@@ -230,8 +287,8 @@ export function ProjectSearchPage() {
     <div className="p-6 space-y-6 bg-gray-50 min-h-full">
       {/* Header */}
       <div>
-        <h1 className="text-2xl text-gray-900 mb-2">Project Search</h1>
-        <p className="text-gray-600">Search and manage construction projects</p>
+        <h1 className="text-2xl text-gray-900 mb-2">NYC Parks Project Search</h1>
+        <p className="text-gray-600">Search and manage NYC Parks construction projects</p>
       </div>
 
       {/* Stats Cards */}
@@ -321,15 +378,15 @@ export function ProjectSearchPage() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg text-gray-900 mb-2">Project Search</h3>
-                  <p className="text-sm text-gray-600">Search and filter construction projects by various criteria</p>
+                  <h3 className="text-lg text-gray-900 mb-2">NYC Parks Project Search</h3>
+                  <p className="text-sm text-gray-600">Search and filter NYC Parks construction projects by park, team, contract number, and other criteria</p>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search projects, locations, managers..."
+                      placeholder="Search projects, parks, teams, contract numbers..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -339,7 +396,10 @@ export function ProjectSearchPage() {
 
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-600">
-                    {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} found
+                    {filteredProjects.length > itemsPerPage 
+                      ? `Showing ${startIndex + 1}-${Math.min(endIndex, filteredProjects.length)} of ${filteredProjects.length} projects`
+                      : `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''} found`
+                    }
                   </p>
                   
                   <div className="flex items-center gap-2">
@@ -375,48 +435,52 @@ export function ProjectSearchPage() {
                         <th className="text-left p-4 text-sm text-gray-600">Project</th>
                         <th className="text-left p-4 text-sm text-gray-600">Type</th>
                         <th className="text-left p-4 text-sm text-gray-600">Status</th>
-                        <th className="text-left p-4 text-sm text-gray-600">Location</th>
+                        <th className="text-left p-4 text-sm text-gray-600">Park</th>
                         <th className="text-left p-4 text-sm text-gray-600">Progress</th>
                         <th className="text-left p-4 text-sm text-gray-600">Budget</th>
-                        <th className="text-left p-4 text-sm text-gray-600">Manager</th>
-                        <th className="text-left p-4 text-sm text-gray-600">Priority</th>
+                        <th className="text-left p-4 text-sm text-gray-600">Design Team</th>
+                        <th className="text-left p-4 text-sm text-gray-600">Construction Team</th>
                         <th className="text-left p-4 text-sm text-gray-600">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProjects.map((project) => (
-                        <tr key={project.id} className="border-b hover:bg-gray-50">
+                      {currentPageProjects.map((project) => (
+                        <tr key={project.project_id} className="border-b hover:bg-gray-50">
                           <td className="p-4">
                             <div>
-                              <p className="text-sm text-gray-900">{project.name}</p>
-                              <p className="text-xs text-gray-500">{project.id}</p>
+                              <p className="text-sm text-gray-900">{project.pi_short_description}</p>
+                              <p className="text-xs text-gray-500">{project.pi_park_contract_no}</p>
                             </div>
                           </td>
-                          <td className="p-4 text-sm text-gray-600">{project.type}</td>
+                          <td className="p-4 text-sm text-gray-600">{project.pi_project_type}</td>
                           <td className="p-4">
-                            <Badge className={getStatusColor(project.status)}>
-                              {project.status}
+                            <Badge className={getStatusColor(project.pi_park_contract_status)}>
+                              {project.pi_park_contract_status}
                             </Badge>
                           </td>
-                          <td className="p-4 text-sm text-gray-600">{project.location}</td>
+                          <td className="p-4 text-sm text-gray-600">{project.pi_park_name}</td>
                           <td className="p-4">
                             <div className="flex items-center gap-2">
                               <div className="w-20 bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-green-600 h-2 rounded-full"
-                                  style={{ width: `${project.progress}%` }}
+                                  style={{ width: `${project.pi_progress_to_date}%` }}
                                 />
                               </div>
-                              <span className="text-xs text-gray-600">{project.progress}%</span>
+                              <span className="text-xs text-gray-600">{project.pi_progress_to_date}%</span>
                             </div>
                           </td>
                           <td className="p-4 text-sm text-gray-600">
-                            {formatCurrency(project.budget)}
+                            {formatCurrency(project.pi_total_project_funding_amount)}
                           </td>
-                          <td className="p-4 text-sm text-gray-600">{project.manager}</td>
                           <td className="p-4">
-                            <Badge className={getPriorityColor(project.priority)}>
-                              {project.priority}
+                            <Badge className={getUnitColor(project.pi_managing_design_team_unit)}>
+                              {project.pi_managing_design_team_unit}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <Badge className={getUnitColor(project.pi_managing_construction_team_unit)}>
+                              {project.pi_managing_construction_team_unit}
                             </Badge>
                           </td>
                           <td className="p-4">
@@ -440,41 +504,45 @@ export function ProjectSearchPage() {
           {/* Projects Cards */}
           {viewMode === 'cards' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredProjects.map((project) => (
-                <Card key={project.id} className="hover:shadow-lg transition-shadow">
+              {currentPageProjects.map((project) => (
+                <Card key={project.project_id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-start justify-between">
-                        <h3 className="text-sm text-gray-900 line-clamp-2">{project.name}</h3>
-                        <Badge className={getStatusColor(project.status)}>
-                          {project.status}
+                        <h3 className="text-sm text-gray-900 line-clamp-2">{project.pi_short_description}</h3>
+                        <Badge className={getStatusColor(project.pi_park_contract_status)}>
+                          {project.pi_park_contract_status}
                         </Badge>
                       </div>
                       
                       <div className="space-y-2 text-xs text-gray-600">
-                        <p><span className="font-medium">Type:</span> {project.type}</p>
-                        <p><span className="font-medium">Location:</span> {project.location}</p>
-                        <p><span className="font-medium">Manager:</span> {project.manager}</p>
-                        <p><span className="font-medium">Budget:</span> {formatCurrency(project.budget)}</p>
+                        <p><span className="font-medium">Contract No:</span> {project.pi_park_contract_no}</p>
+                        <p><span className="font-medium">Type:</span> {project.pi_project_type}</p>
+                        <p><span className="font-medium">Park:</span> {project.pi_park_name}</p>
+                        <p><span className="font-medium">Budget:</span> {formatCurrency(project.pi_total_project_funding_amount)}</p>
+                        <p><span className="font-medium">Design Team:</span> {project.pi_managing_design_team_unit}</p>
+                        <p><span className="font-medium">Construction Team:</span> {project.pi_managing_construction_team_unit}</p>
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs text-gray-600">Progress</span>
-                          <span className="text-xs text-gray-600">{project.progress}%</span>
+                          <span className="text-xs text-gray-600">{project.pi_progress_to_date}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-green-600 h-2 rounded-full"
-                            style={{ width: `${project.progress}%` }}
+                            style={{ width: `${project.pi_progress_to_date}%` }}
                           />
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between pt-2">
-                        <Badge className={getPriorityColor(project.priority)}>
-                          {project.priority}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge className={getUnitColor(project.pi_managing_design_team_unit)}>
+                            {project.pi_managing_design_team_unit}
+                          </Badge>
+                        </div>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -487,6 +555,59 @@ export function ProjectSearchPage() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {filteredProjects.length > itemsPerPage && (
+            <div className="mt-6 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNumber;
+                    if (totalPages <= 5) {
+                      pageNumber = i + 1;
+                    } else {
+                      const startPage = Math.max(1, currentPage - 2);
+                      const endPage = Math.min(totalPages, startPage + 4);
+                      pageNumber = startPage + i;
+                      if (pageNumber > endPage) return null;
+                    }
+                    
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                          className="cursor-pointer"
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  {totalPages > 5 && currentPage < totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </TabsContent>

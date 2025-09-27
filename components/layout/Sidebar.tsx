@@ -63,7 +63,7 @@ export function Sidebar() {
   console.log('Sidebar: Rendering sidebar...');
   const { isProjectSelected } = useProject();
   const { isLoggedIn } = useAuth();
-  const { hasUnsavedData } = useFormGenerator();
+  const { hasUnsavedData, state: formGeneratorState } = useFormGenerator();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
@@ -121,6 +121,25 @@ export function Sidebar() {
 
   const handleNavigation = (href: string) => {
     console.log('Sidebar: Navigation requested to:', href);
+    
+    // Special handling for Form Picker - include selected forms if available
+    if (href === '/forms/picker') {
+      if (formGeneratorState.selectedForms.length > 0) {
+        const selectedFormsParam = formGeneratorState.selectedForms.join(',');
+        href = `/forms/picker?selected=${selectedFormsParam}`;
+        console.log('Sidebar: Updated Form Picker URL with selected forms:', href);
+      }
+    }
+    
+    // Special handling for Prefill Preview
+    if (href === '/forms/prefill-preview') {
+      // If we have selected forms in context, include them in the URL
+      if (formGeneratorState.selectedForms.length > 0) {
+        const selectedFormsParam = formGeneratorState.selectedForms.join(',');
+        href = `/forms/prefill-preview?selected=${selectedFormsParam}`;
+        console.log('Sidebar: Updated Prefill Preview URL with selected forms:', href);
+      }
+    }
     
     // Check if we're in a Form Generator flow and have unsaved data
     const isFormGeneratorFlow = currentPath.startsWith('/forms/project-search') ||

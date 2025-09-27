@@ -16,7 +16,7 @@ export const authService = {
     console.log('🔐 AuthService: Attempting HTTP API login for:', credentials.username);
     
     try {
-      const response = await httpPost<LoginResponse>('/autheniticate', credentials);
+      const response = await httpPost<LoginResponse>('/authenticate', credentials);
       console.log('🔐 AuthService: ✅ HTTP login successful');
       return response;
     } catch (error) {

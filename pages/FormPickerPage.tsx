@@ -75,6 +75,14 @@ export function FormPickerPage() {
     if (urlSelectedForms.length > 0) {
       console.log('📋 FormPickerPage: Restoring selected forms from URL:', urlSelectedForms);
       setSelectedForms(urlSelectedForms);
+      // Also sync to FormGeneratorContext
+      setFormGenSelectedForms(urlSelectedForms);
+    } else if (formGenState.selectedForms.length > 0) {
+      // If no URL params but FormGeneratorContext has selected forms, restore from context
+      console.log('📋 FormPickerPage: Restoring selected forms from FormGeneratorContext:', formGenState.selectedForms);
+      setSelectedForms(formGenState.selectedForms);
+      // Update URL to reflect the context state
+      navigateWithSelectedForms('/forms/picker', formGenState.selectedForms);
     }
 
     // Load forms
@@ -143,6 +151,10 @@ export function FormPickerPage() {
         ? prev.filter(id => id !== formId)
         : [...prev, formId];
       
+      // Update FormGeneratorContext as well
+      setFormGenSelectedForms(newSelection);
+      console.log('📋 FormPickerPage: Updated selected forms in context:', newSelection);
+      
       // Update URL with new selection
       navigateWithSelectedForms('/forms/picker', newSelection);
       
@@ -154,6 +166,10 @@ export function FormPickerPage() {
     setSelectedForms(prev => {
       const newSelection = prev.filter(id => id !== formId);
       
+      // Update FormGeneratorContext as well
+      setFormGenSelectedForms(newSelection);
+      console.log('📋 FormPickerPage: Updated selected forms in context:', newSelection);
+      
       // Update URL with new selection
       navigateWithSelectedForms('/forms/picker', newSelection);
       
@@ -163,6 +179,10 @@ export function FormPickerPage() {
 
   const clearAllSelections = () => {
     setSelectedForms([]);
+    
+    // Update FormGeneratorContext as well
+    setFormGenSelectedForms([]);
+    console.log('📋 FormPickerPage: Cleared all selected forms from context');
     
     // Update URL to remove selection
     navigateWithSelectedForms('/forms/picker', []);
@@ -190,12 +210,21 @@ export function FormPickerPage() {
   };
 
   const navigateToProjectSearch = () => {
-    window.history.pushState({}, '', '/projects');
-    window.dispatchEvent(new Event('navigate'));
+    if ((window as any).manualNavigate) {
+      (window as any).manualNavigate('/forms/project-search');
+    } else {
+      // Fallback
+      window.history.pushState({}, '', '/forms/project-search');
+      window.dispatchEvent(new Event('navigate'));
+    }
   };
 
   const proceedToPreview = () => {
     if (selectedForms.length === 0) return;
+    
+    // Save to FormGeneratorContext for persistence across page navigation
+    setFormGenSelectedForms(selectedForms);
+    console.log('📋 FormPickerPage: Saved selected forms to context:', selectedForms);
     
     // Navigate to prefill preview with selected forms in URL
     navigateWithSelectedForms('/forms/prefill-preview', selectedForms);
@@ -265,41 +294,41 @@ export function FormPickerPage() {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {selectedProject.name.charAt(0)}
+                      {selectedProject.pi_short_description?.charAt(0) || 'P'}
                     </span>
                   </div>
-                  <h3 className="text-lg text-gray-900">{selectedProject.name}</h3>
-                  <Badge className={getStatusColor(selectedProject.status)}>
-                    {selectedProject.status}
+                  <h3 className="text-lg text-gray-900">{selectedProject.pi_short_description}</h3>
+                  <Badge className={getStatusColor(selectedProject.pi_park_contract_status)}>
+                    {selectedProject.pi_park_contract_status}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">{selectedProject.description}</p>
+                <p className="text-sm text-gray-600 mb-4">Contract: {selectedProject.pi_park_contract_no}</p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <MapPin className="h-4 w-4" />
-                    <span>{selectedProject.location}</span>
+                    <span>{selectedProject.pi_park_name}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <User className="h-4 w-4" />
-                    <span>{selectedProject.manager}</span>
+                    <span>{selectedProject.pi_managing_design_team_unit}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <DollarSign className="h-4 w-4" />
-                    <span>{formatCurrency(selectedProject.budget)}</span>
+                    <span>{formatCurrency(selectedProject.pi_total_project_funding_amount)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
-                    <span>{selectedProject.endDate}</span>
+                    <span>{selectedProject.phase_end_date}</span>
                   </div>
                 </div>
                 
                 <div className="mt-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-600">Progress</span>
-                    <span className="text-sm text-gray-600">{selectedProject.progress}%</span>
+                    <span className="text-sm text-gray-600">{selectedProject.pi_progress_to_date}%</span>
                   </div>
-                  <Progress value={selectedProject.progress} className="h-2" />
+                  <Progress value={selectedProject.pi_progress_to_date} className="h-2" />
                 </div>
               </div>
             </div>

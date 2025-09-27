@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useProject } from '../../contexts/ProjectContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFormGenerator } from '../../contexts/FormGeneratorContext';
@@ -43,12 +43,12 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/' },
-  { id: 'project-search', label: 'Project Search', icon: Search, href: '/projects' },
   { 
     id: 'form-generator', 
     label: 'Form Generator', 
     icon: FileText,
     children: [
+      { id: 'project-search', label: 'Project Search', icon: Search, href: '/forms/project-search' },
       { id: 'form-picker', label: 'Form Picker', icon: FolderOpen, href: '/forms/picker' },
       { id: 'prefill-preview', label: 'Prefill Preview', icon: Eye, href: '/forms/prefill-preview' }
     ]
@@ -61,26 +61,23 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 export function RouteSidebar() {
-  console.log('RouteSidebar: Rendering route-based sidebar...');
-  const location = useLocation();
+  console.log('RouteSidebar: Rendering React Router-based sidebar...');
   const navigate = useNavigate();
+  const location = useLocation();
   const { isProjectSelected } = useProject();
   const { isLoggedIn } = useAuth();
-  const { hasUnsavedData } = useFormGenerator();
+  const { hasUnsavedData, state: formGeneratorState } = useFormGenerator();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [currentPath, setCurrentPath] = useState(location.pathname);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
   const [showNavigationGuard, setShowNavigationGuard] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log('RouteSidebar: Location changed to:', location.pathname);
-    setCurrentPath(location.pathname);
-  }, [location.pathname]);
+  const currentPath = location.pathname;
 
   // Auto-expand Form Generator menu when any of its routes are active
   useEffect(() => {
-    const isFormGeneratorRoute = currentPath.startsWith('/forms/picker') || 
+    const isFormGeneratorRoute = currentPath.startsWith('/forms/project-search') ||
+                                currentPath.startsWith('/forms/picker') || 
                                 currentPath.startsWith('/forms/prefill-preview');
     
     if (isFormGeneratorRoute && !expandedItems.includes('form-generator')) {
@@ -94,7 +91,7 @@ export function RouteSidebar() {
   };
 
   const requiresProjectSelection = (href: string) => {
-    // These routes require project selection
+    // These routes require project selection (except Project Search itself)
     const projectRequiredRoutes = [
       '/forms/picker',
       '/forms/prefill-preview'
@@ -105,13 +102,35 @@ export function RouteSidebar() {
   const handleNavigation = (href: string) => {
     console.log('RouteSidebar: Navigation requested to:', href);
     
+    // Build URL with query params
+    let targetUrl = href;
+    
+    // Special handling for Form Picker - include selected forms if available
+    if (href === '/forms/picker') {
+      if (formGeneratorState.selectedForms.length > 0) {
+        const selectedFormsParam = formGeneratorState.selectedForms.join(',');
+        targetUrl = `/forms/picker?selected=${selectedFormsParam}`;
+        console.log('RouteSidebar: Updated Form Picker URL with selected forms:', targetUrl);
+      }
+    }
+    
+    // Special handling for Prefill Preview
+    if (href === '/forms/prefill-preview') {
+      // If we have selected forms in context, include them in the URL
+      if (formGeneratorState.selectedForms.length > 0) {
+        const selectedFormsParam = formGeneratorState.selectedForms.join(',');
+        targetUrl = `/forms/prefill-preview?selected=${selectedFormsParam}`;
+        console.log('RouteSidebar: Updated Prefill Preview URL with selected forms:', targetUrl);
+      }
+    }
+    
     // Check if we're in a Form Generator flow and have unsaved data
-    const isFormGeneratorFlow = currentPath.startsWith('/projects') ||
+    const isFormGeneratorFlow = currentPath.startsWith('/forms/project-search') ||
                                 currentPath.startsWith('/forms/picker') ||
                                 currentPath.startsWith('/forms/prefill-preview');
     
     // Check if navigating away from Form Generator flow to non-generator routes
-    const formGeneratorRoutes = ['/projects', '/forms/picker', '/forms/prefill-preview'];
+    const formGeneratorRoutes = ['/forms/project-search', '/forms/picker', '/forms/prefill-preview'];
     const isNavigatingAwayFromFlow = isFormGeneratorFlow && !formGeneratorRoutes.some(route => href.startsWith(route));
     
     if (isNavigatingAwayFromFlow && hasUnsavedData()) {
@@ -130,7 +149,7 @@ export function RouteSidebar() {
     // Check authentication first
     if (requiresAuthentication(href) && !isLoggedIn) {
       // Navigate anyway - ProtectedRoute will handle the auth check
-      navigate(href);
+      navigate(targetUrl);
       return;
     }
 
@@ -139,12 +158,12 @@ export function RouteSidebar() {
       return;
     }
     
-    navigate(href);
+    navigate(targetUrl);
   };
 
   const handleWarningDialogGoToProjects = () => {
     setShowWarningDialog(false);
-    navigate('/projects');
+    navigate('/forms/project-search');
   };
 
   const handleNavigationGuardConfirm = () => {

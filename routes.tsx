@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
         element: <HomePage />, // Dashboard - accessible without login
       },
       {
-        path: 'projects',
+        path: 'forms/project-search',
         element: (
           <ProtectedRoute>
             <ProjectSearchPage />

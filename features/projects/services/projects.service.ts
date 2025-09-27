@@ -14,7 +14,7 @@ export class ProjectsService {
     console.log('🔧 ProjectsService: getProjectCatalog() called');
     try {
       console.log('🔧 ProjectsService: About to call httpGet with /projectCatalog');
-      const data = await httpGet<ProjectCatalog>('/projectCatalog');
+      const data = await httpGet<ProjectCatalog>('/cfg/projectCatalog');
       console.log('🔧 ProjectsService: httpGet returned successfully:', data);
       return data;
     } catch (error) {
@@ -56,21 +56,26 @@ export class ProjectsService {
     }
 
     const filteredProjects = catalog.projects.filter(project =>
-      project.name.toLowerCase().includes(query.toLowerCase()) ||
-      project.location.toLowerCase().includes(query.toLowerCase()) ||
-      project.manager.toLowerCase().includes(query.toLowerCase()) ||
-      project.type.toLowerCase().includes(query.toLowerCase()) ||
-      project.status.toLowerCase().includes(query.toLowerCase())
+      project.pi_short_description.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_park_name.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_managing_design_team_unit.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_managing_construction_team_unit.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_project_type.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_park_contract_status.toLowerCase().includes(query.toLowerCase()) ||
+      project.pi_park_contract_no.toLowerCase().includes(query.toLowerCase())
     );
 
     // Recalculate stats for filtered results
     const stats = {
       total: filteredProjects.length,
-      active: filteredProjects.filter(p => p.status.toLowerCase() === 'active').length,
-      completed: filteredProjects.filter(p => p.status.toLowerCase() === 'completed').length,
-      planning: filteredProjects.filter(p => p.status.toLowerCase() === 'planning').length,
-      totalBudget: filteredProjects.reduce((sum, p) => sum + p.budget, 0),
-      totalSpent: filteredProjects.reduce((sum, p) => sum + p.spent, 0)
+      active: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'active').length,
+      completed: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'completed').length,
+      planning: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'planning').length,
+      design: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'design').length,
+      construction: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'construction').length,
+      procurement: filteredProjects.filter(p => p.pi_park_contract_status.toLowerCase() === 'procurement').length,
+      totalBudget: filteredProjects.reduce((sum, p) => sum + (p.pi_total_project_funding_amount || 0), 0),
+      totalSpent: filteredProjects.reduce((sum, p) => sum + (p.pi_registration_amount || 0), 0)
     };
 
     return {

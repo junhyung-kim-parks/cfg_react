@@ -25,7 +25,7 @@ interface FormFieldData {
 }
 
 export function PrefillPreviewPage() {
-  const { setCurrentStep } = useFormGenerator();
+  const { setCurrentStep, state } = useFormGenerator();
   const [prefillData, setPrefillData] = useState<PrefillData | null>(null);
   const [selectedFormItems, setSelectedFormItems] = useState<FormItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +76,21 @@ export function PrefillPreviewPage() {
           }
         } catch (error) {
           console.error('📋 PrefillPreviewPage: Failed to parse data param:', error);
+        }
+      }
+
+      // Third priority: Use FormGeneratorContext state
+      if (selectedFormIds.length === 0 && state.selectedForms.length > 0) {
+        selectedFormIds = state.selectedForms;
+        console.log('📋 PrefillPreviewPage: Using selected forms from context:', selectedFormIds);
+        
+        // Use project from context if available
+        if (state.selectedProject && !data) {
+          data = {
+            project: state.selectedProject,
+            selectedForms: selectedFormIds
+          };
+          setPrefillData(data);
         }
       }
 
@@ -181,7 +196,23 @@ export function PrefillPreviewPage() {
           setActiveFormId(activeForm.id);
         }
       } else {
-        console.warn('📋 PrefillPreviewPage: No selected forms found in URL or data');
+        console.warn('📋 PrefillPreviewPage: No selected forms found in URL, data, or context');
+        // Show a helpful message instead of empty state
+        setPrefillData({
+          project: {
+            id: 'no-project',
+            name: 'No Project Selected',
+            description: 'Please select a project and forms first',
+            location: '',
+            manager: '',
+            status: 'inactive',
+            startDate: '',
+            endDate: '',
+            budget: 0,
+            progress: 0
+          },
+          selectedForms: []
+        });
       }
     } catch (error) {
       console.error('Failed to load prefill data:', error);
@@ -325,19 +356,34 @@ export function PrefillPreviewPage() {
     );
   }
 
-  if (!prefillData) {
+  if (!prefillData || (prefillData.selectedForms.length === 0 && selectedFormItems.length === 0)) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No prefill data found</p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.history.back()} 
-            className="mt-4"
-          >
-            Go Back
-          </Button>
+          <h2 className="text-lg font-medium text-gray-900 mb-2">No Forms Selected</h2>
+          <p className="text-gray-500 mb-6">
+            To use the Prefill Preview, you need to first select a project and choose forms to generate.
+          </p>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => {
+                (window as any).manualNavigate('/forms/project-search');
+              }}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              Start with Project Search
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                (window as any).manualNavigate('/forms/picker');
+              }}
+              className="w-full"
+            >
+              Go to Form Picker
+            </Button>
+          </div>
         </div>
       </div>
     );
