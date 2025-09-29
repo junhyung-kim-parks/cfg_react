@@ -47,8 +47,18 @@ export async function httpGet<T>(path: string, init: RequestInit = {}): Promise<
 }
 
 export async function httpPost<T>(path: string, body?: any, init: RequestInit = {}): Promise<T> {
+  const config = getRuntimeConfig();
+  const base = (config?.API_BASE || (import.meta?.env?.VITE_API_BASE) || '').trim();
+  
+  // In mock mode, POST requests will fail and should use fallback logic in services
+  if (!base) {
+    console.log(`🚀 HTTP POST (Mock Mode): ${path} - will throw for fallback`);
+    throw new Error(`Mock mode: POST ${path} not supported, use embedded dataset fallback`);
+  }
+  
   const url = resolveUrl(path);
   console.log(`🚀 HTTP POST: ${path} -> ${url}`);
+  console.log(`📋 POST Body:`, body);
   
   const res = await fetch(url, {
     ...init,

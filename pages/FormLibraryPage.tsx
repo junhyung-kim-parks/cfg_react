@@ -130,7 +130,7 @@ export function FormLibraryPage() {
     setIsFieldEditorOpen(true);
     
     try {
-      const mappings = await formFieldMappingsService.getFormMappings([form.form_id]);
+      const mappings = await formFieldMappingsService.getFormMappingsWithProject([form.form_id]);
       const mapping = mappings[form.form_id];
       
       if (mapping) {

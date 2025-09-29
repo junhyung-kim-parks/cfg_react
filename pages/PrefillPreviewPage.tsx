@@ -1,18 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, FileText, Building, Download } from 'lucide-react';
+import { ChevronLeft, FileText, Building, Download, Edit3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Checkbox } from '../components/ui/checkbox';
+import { Input } from '../components/ui/input';
 import { list as getFormList } from '../features/forms/services/forms.service';
 import { formFieldMappingsService } from '../features/forms/services/formFieldMappings.service';
 import { downloadTemplate } from '../services/api/download';
 import { useFormGenerator } from '../contexts/FormGeneratorContext';
-import { getSelectedFormsFromUrl, navigateWithSelectedForms } from '../utils/urlParams';
-import { generateFormFieldMappings, type ProjectData } from '../services/embedded_dataset/form_field_mappings';
+import { getSelectedFormsFromUrl } from '../utils/urlParams';
 import type { FormItem } from '../features/forms/types';
 import type { Project } from '../features/projects/types';
 import { toast } from 'sonner@2.0.3';
@@ -26,16 +24,27 @@ interface FormFieldData {
   [key: string]: string | number | boolean;
 }
 
+interface FormFieldEntry {
+  map_id: string;
+  label: string;
+  value: string | number | boolean;
+  source_col: string;
+  data_type: 'text' | 'number' | 'boolean' | 'date';
+  display_order?: number;
+}
+
 export function PrefillPreviewPage() {
   const { setCurrentStep, setSelectedProject, state } = useFormGenerator();
   const [prefillData, setPrefillData] = useState<PrefillData | null>(null);
   const [selectedFormItems, setSelectedFormItems] = useState<FormItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState<FormFieldData>({});
   const [formFieldsData, setFormFieldsData] = useState<{[formId: string]: FormFieldData}>({});
   const [activeFormId, setActiveFormId] = useState<string | null>(null);
   const [formMappings, setFormMappings] = useState<{[formId: string]: any}>({});
+  const [loadingFormIds, setLoadingFormIds] = useState<Set<string>>(new Set());
+  const [loadedFormIds, setLoadedFormIds] = useState<Set<string>>(new Set());
   const [isDownloading, setIsDownloading] = useState(false);
+  const [editedFieldsData, setEditedFieldsData] = useState<{[formId: string]: FormFieldData}>({});
   const hasMounted = useRef(false);
 
   // Set current step when component mounts
@@ -44,11 +53,19 @@ export function PrefillPreviewPage() {
       hasMounted.current = true;
       setCurrentStep('prefill-preview');
     }
-  }, []);
+  }, [setCurrentStep]);
 
   useEffect(() => {
     loadPrefillData();
   }, []);
+
+  // Auto-load the first form's data when both activeFormId and prefillData are ready
+  useEffect(() => {
+    if (activeFormId && prefillData && !loadedFormIds.has(activeFormId) && !loadingFormIds.has(activeFormId)) {
+      console.log('📋 PrefillPreviewPage: Auto-loading data for active form:', activeFormId);
+      loadFormMapping(activeFormId);
+    }
+  }, [activeFormId, prefillData]);
 
   const loadPrefillData = async () => {
     try {
@@ -121,23 +138,20 @@ export function PrefillPreviewPage() {
           };
           setPrefillData(data);
           
+          console.log('📋 PrefillPreviewPage: Set prefill data with project:', {
+            hasProject: !!data.project,
+            projectId: data.project?.project_id || data.project?.id,
+            projectName: data.project?.name || data.project?.pi_short_description,
+            selectedFormsCount: data.selectedForms?.length || 0
+          });
+          
           // Also set the project in FormGeneratorContext for TopHeader display
           if (data.project) {
             setSelectedProject(data.project);
           }
         }
 
-        // Initialize form data with project information
-        const initialFormData = {
-          projectName: data.project?.name || 'Sample Project',
-          projectId: `PROJ-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-          contractor: 'ABC Construction Inc.',
-          projectManager: data.project?.manager || 'John Doe',
-          startDate: new Date().toISOString().split('T')[0],
-          location: data.project?.location || 'New York, NY',
-          description: data.project?.description || 'Sample project description'
-        };
-        setFormData(initialFormData);
+
 
         // Load all forms to get details of selected forms
         const allForms = await getFormList();
@@ -146,65 +160,13 @@ export function PrefillPreviewPage() {
         );
         setSelectedFormItems(selectedItems);
 
-        // Convert project data to embedded dataset format
-        const projectForEmbedded: ProjectData | undefined = data.project ? {
-          name: data.project.name,
-          id: data.project.id,
-          description: data.project.description,
-          location: data.project.location,
-          manager: data.project.manager,
-          status: data.project.status,
-          startDate: data.project.startDate,
-          endDate: data.project.endDate,
-          budget: data.project.budget,
-          progress: data.project.progress
-        } : undefined;
-
-        // Load actual form field mappings with embedded dataset fallback
-        let loadedFormMappings: any = {};
-        try {
-          loadedFormMappings = await formFieldMappingsService.getFormMappings(selectedFormIds);
-          console.log('📋 PrefillPreviewPage: HTTP mapping service succeeded');
-        } catch (error) {
-          console.warn('📋 PrefillPreviewPage: HTTP mapping service failed, using embedded dataset:', error);
-        }
-        
-        // Generate embedded mappings with actual project data
-        const embeddedMappings = generateFormFieldMappings(projectForEmbedded);
-        console.log('📋 PrefillPreviewPage: Generated embedded mappings for project:', projectForEmbedded?.name);
-        
-        // Initialize form fields data for each selected form using actual mappings
-        const fieldsData: {[formId: string]: FormFieldData} = {};
-        const finalMappings: {[formId: string]: any} = {};
-        
-        selectedItems.forEach(form => {
-          // Try HTTP mapping first, then fallback to embedded dataset with project data
-          let mapping = loadedFormMappings[form.form_id];
-          if (!mapping && embeddedMappings[form.form_id]) {
-            mapping = embeddedMappings[form.form_id];
-            console.log(`📋 PrefillPreviewPage: Using embedded mapping for ${form.form_id} with project: ${projectForEmbedded?.name || 'default'}`);
-          }
-          
-          finalMappings[form.form_id] = mapping;
-          
-          if (mapping && mapping.fields) {
-            // Use actual mapping fields directly
-            fieldsData[form.form_id] = {
-              ...mapping.fields
-            };
-          } else {
-            // Fallback to generated fields if no mapping found
-            fieldsData[form.form_id] = generateFormFields(form, initialFormData);
-          }
-        });
-        
-        setFormMappings(finalMappings);
-        setFormFieldsData(fieldsData);
+        // Note: Form field mappings will be loaded individually when each form is clicked
 
         // Set the first form as active, or prioritize FORM-003 if it exists
         const activeForm = selectedItems.find(f => f.form_id === 'FORM-003') || selectedItems[0];
         if (activeForm) {
           setActiveFormId(activeForm.form_id);
+          console.log('📋 PrefillPreviewPage: Set initial active form:', activeForm.form_id);
         }
       } else {
         console.warn('📋 PrefillPreviewPage: No selected forms found in URL, data, or context');
@@ -232,9 +194,138 @@ export function PrefillPreviewPage() {
     }
   };
 
+  // Load mapping data for a specific form
+  const loadFormMapping = async (formId: string) => {
+    // Skip if already loaded or currently loading
+    if (loadedFormIds.has(formId) || loadingFormIds.has(formId)) {
+      return;
+    }
+
+    console.log(`📋 PrefillPreviewPage: Loading mapping for form ${formId}`);
+    
+    // Set loading state
+    setLoadingFormIds(prev => new Set([...prev, formId]));
+
+    try {
+      console.log(`📋 PrefillPreviewPage: Loading mapping for form ${formId} with project:`, {
+        hasProject: !!prefillData?.project,
+        projectId: prefillData?.project?.project_id || prefillData?.project?.id,
+        projectName: prefillData?.project?.name || prefillData?.project?.pi_short_description
+      });
+      
+      // Use POST API to get mapping for this specific form
+      const loadedFormMappings = await formFieldMappingsService.getFormMappingsWithProject(
+        [formId], 
+        prefillData?.project
+      );
+      
+      console.log(`📋 PrefillPreviewPage: Successfully loaded mapping for ${formId}`);
+      
+      const mapping = loadedFormMappings[formId];
+      
+      if (mapping) {
+        // Update form mappings
+        setFormMappings(prev => ({
+          ...prev,
+          [formId]: mapping
+        }));
+
+        // Convert mapping to form fields data
+        let fieldsData: FormFieldData = {};
+        
+        if (mapping.fields) {
+          // Check if it's the new API structure (array of FormFieldEntry) or old structure (object)
+          if (Array.isArray(mapping.fields)) {
+            // New API structure - convert to old format for compatibility
+            mapping.fields.forEach((field: FormFieldEntry) => {
+              fieldsData[field.label] = field.value;
+            });
+            console.log(`📋 PrefillPreviewPage: Converted new API structure for ${formId}, ${mapping.fields.length} fields`);
+          } else {
+            // Old structure - use directly
+            fieldsData = { ...mapping.fields };
+            console.log(`📋 PrefillPreviewPage: Using legacy structure for ${formId}`);
+          }
+        }
+
+        // Update form fields data
+        setFormFieldsData(prev => ({
+          ...prev,
+          [formId]: fieldsData
+        }));
+
+        // Mark as loaded
+        setLoadedFormIds(prev => new Set([...prev, formId]));
+      } else {
+        console.warn(`📋 PrefillPreviewPage: No mapping found for ${formId}, using fallback`);
+        
+        // Generate fallback fields
+        const form = selectedFormItems.find(f => f.form_id === formId);
+        if (form) {
+          const fallbackFields = generateFormFields(form);
+          setFormFieldsData(prev => ({
+            ...prev,
+            [formId]: fallbackFields
+          }));
+        }
+        
+        // Still mark as loaded to avoid retry
+        setLoadedFormIds(prev => new Set([...prev, formId]));
+      }
+    } catch (error) {
+      console.error(`📋 PrefillPreviewPage: Failed to load mapping for ${formId}:`, error);
+      
+      // Generate fallback fields on error
+      const form = selectedFormItems.find(f => f.form_id === formId);
+      if (form) {
+        const fallbackFields = generateFormFields(form);
+        setFormFieldsData(prev => ({
+          ...prev,
+          [formId]: fallbackFields
+        }));
+      }
+      
+      // Mark as loaded to avoid retry
+      setLoadedFormIds(prev => new Set([...prev, formId]));
+    } finally {
+      // Remove from loading state
+      setLoadingFormIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(formId);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle form click with data loading
+  const handleFormClick = async (formId: string) => {
+    setActiveFormId(formId);
+    await loadFormMapping(formId);
+  };
+
+  // Helper function to check if a value is blank/empty
+  const isBlankValue = (value: any, dataType?: string): boolean => {
+    if (value === null || value === undefined) return true;
+    if (typeof value === 'string' && value.trim() === '') return true;
+    // Treat 0 as blank for number fields
+    if (dataType === 'number' && value === 0) return true;
+    return false;
+  };
+
+  // Handle field value changes for editable fields
+  const handleFieldChange = (formId: string, fieldKey: string, newValue: string | number | boolean) => {
+    setEditedFieldsData(prev => ({
+      ...prev,
+      [formId]: {
+        ...(prev[formId] || {}),
+        [fieldKey]: newValue
+      }
+    }));
+  };
+
   // Generate sample form fields based on form type and prefill data
-  const generateFormFields = (form: FormItem, projectData: FormFieldData): FormFieldData => {
-    const baseFields = {
+  const generateFormFields = (form: FormItem): FormFieldData => {
+    return {
       ContractNo: `Q123-456M`,
       TimeAllowedCCD: 365,
       ConstructionSupervision: 'Consultant',
@@ -243,18 +334,13 @@ export function PrefillPreviewPage() {
       BidPrice: 5000000,
       Req_ProgressSchedule_Y: true,
       Insurance_CGL_Y: true,
-      DoT_MPT_Y: false
-    };
-
-    // Add project-specific data
-    return {
-      ...baseFields,
-      ProjectName: projectData.projectName || 'Sample Project',
-      ProjectLocation: projectData.location || 'New York, NY',
-      ProjectManager: projectData.projectManager || 'John Doe',
-      ProjectStartDate: projectData.startDate || new Date().toISOString().split('T')[0],
-      Contractor: projectData.contractor || 'ABC Construction Inc.',
-      ProjectDescription: projectData.description || 'Sample project description'
+      DoT_MPT_Y: false,
+      ProjectName: prefillData?.project?.name || 'Sample Project',
+      ProjectLocation: prefillData?.project?.location || 'New York, NY',
+      ProjectManager: prefillData?.project?.manager || 'John Doe',
+      ProjectStartDate: new Date().toISOString().split('T')[0],
+      Contractor: 'ABC Construction Inc.',
+      ProjectDescription: prefillData?.project?.description || 'Sample project description'
     };
   };
 
@@ -268,6 +354,22 @@ export function PrefillPreviewPage() {
     try {
       const selectedFormIds = selectedFormItems.map(form => form.form_id);
       
+      // Load data for any forms that haven't been loaded yet
+      const unloadedForms = selectedFormIds.filter(formId => !loadedFormIds.has(formId));
+      if (unloadedForms.length > 0) {
+        console.log(`📄 PrefillPreviewPage: Loading data for ${unloadedForms.length} unloaded forms before download`);
+        await Promise.all(unloadedForms.map(formId => loadFormMapping(formId)));
+      }
+      
+      // Merge original form fields data with edited fields data
+      const mergedFormFieldsData: {[formId: string]: FormFieldData} = {};
+      selectedFormIds.forEach(formId => {
+        mergedFormFieldsData[formId] = {
+          ...(formFieldsData[formId] || {}),
+          ...(editedFieldsData[formId] || {})
+        };
+      });
+      
       // Prepare project data for the download request
       const projectData = prefillData?.project ? {
         name: prefillData.project.pi_short_description || prefillData.project.name || 'Unknown Project',
@@ -279,13 +381,14 @@ export function PrefillPreviewPage() {
       console.log('📄 PrefillPreviewPage: Initiating download with data:', {
         formIds: selectedFormIds,
         projectData,
-        fieldsDataKeys: Object.keys(formFieldsData)
+        fieldsDataKeys: Object.keys(mergedFormFieldsData),
+        editedFieldsCount: Object.keys(editedFieldsData).length
       });
 
-      // Use the new download API with project data
+      // Use the new download API with merged data
       const result = await downloadTemplate({
         formIds: selectedFormIds,
-        formFieldsData,
+        formFieldsData: mergedFormFieldsData,
         projectData
       });
       
@@ -312,45 +415,216 @@ export function PrefillPreviewPage() {
     }
   };
 
-  // Render form fields as key-value pairs
+  // Render form fields with enhanced information showing source column and data type
   const renderFormFields = (formId: string) => {
-    const fields = formFieldsData[formId] || {};
-    const entries = Object.entries(fields);
-    
-    if (entries.length === 0) {
+    // Check if this form is currently being loaded
+    if (loadingFormIds.has(formId)) {
       return (
-        <div className="text-center py-8 text-gray-500">
-          <p>No field mappings available for this form</p>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto mb-2"></div>
+          <p className="text-gray-600">Loading form fields...</p>
         </div>
       );
     }
 
-    // Show first 10 fields, then show count if more
-    const displayFields = entries.slice(0, 10);
+    // Check if form data hasn't been loaded yet
+    if (!loadedFormIds.has(formId)) {
+      return (
+        <div className="text-center py-8 text-gray-500">
+          <p>Click this form to load its field data</p>
+        </div>
+      );
+    }
+
+    const fields = formFieldsData[formId] || {};
+    const mapping = formMappings[formId];
     
-    return (
-      <div className="space-y-3">
-        {displayFields.map(([key, value]) => (
-          <div key={key} className="flex items-start justify-between py-2 border-b border-gray-200">
-            <div className="flex-1 min-w-0 mr-4">
-              <Label className="text-xs font-medium text-gray-700">{key}</Label>
-            </div>
-            <div className="flex-1 min-w-0">
-              {typeof value === 'boolean' ? (
-                <div className="flex items-center">
-                  <Checkbox checked={value} disabled className="mr-2" />
-                  <span className="text-sm text-gray-600">{value ? 'Yes' : 'No'}</span>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-900 break-words">
-                  {String(value)}
-                </div>
-              )}
-            </div>
+    // Check if we have new API structure with detailed field info
+    const hasDetailedMapping = mapping && Array.isArray(mapping.fields);
+    
+    if (hasDetailedMapping) {
+      // New API structure - show detailed field information
+      const fieldEntries = mapping.fields as FormFieldEntry[];
+      
+      if (fieldEntries.length === 0) {
+        return (
+          <div className="text-center py-8 text-gray-500">
+            <p>No field mappings available for this form</p>
           </div>
-        ))}
-      </div>
-    );
+        );
+      }
+
+      // Sort by display_order if available, otherwise keep original order
+      const sortedFields = [...fieldEntries].sort((a, b) => {
+        const orderA = a.display_order ?? 999;
+        const orderB = b.display_order ?? 999;
+        return orderA - orderB;
+      });
+
+      // Show first 10 fields, then show count if more
+      const displayFields = sortedFields.slice(0, 10);
+      
+      return (
+        <div className="space-y-3">
+          {displayFields.map((field, index) => {
+            const currentValue = editedFieldsData[formId]?.[field.label] ?? field.value;
+            const isBlank = isBlankValue(field.value, field.data_type);
+            
+            return (
+              <div key={field.map_id || `field-${index}`} className="bg-white p-3 rounded-lg border border-gray-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0 mr-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Label className="text-sm font-medium text-gray-900">{field.label}</Label>
+                      <Badge variant="outline" className="text-xs px-1 py-0">
+                        {field.data_type}
+                      </Badge>
+                      {isBlank && (
+                        <Badge variant="secondary" className="text-xs px-1 py-0 flex items-center gap-1">
+                          <Edit3 className="h-3 w-3" />
+                          Editable
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Source: <code className="bg-gray-100 px-1 rounded">{field.source_col}</code>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      Map ID: {field.map_id}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {field.data_type === 'boolean' ? (
+                      <div className="flex items-center">
+                        <Checkbox 
+                          checked={Boolean(currentValue)} 
+                          disabled={!isBlank}
+                          onCheckedChange={(checked) => {
+                            if (isBlank) {
+                              handleFieldChange(formId, field.label, checked);
+                            }
+                          }}
+                          className="mr-2" 
+                        />
+                        <span className="text-sm text-gray-600">{currentValue ? 'Yes' : 'No'}</span>
+                      </div>
+                    ) : isBlank ? (
+                      <Input
+                        type={field.data_type === 'number' ? 'number' : field.data_type === 'date' ? 'date' : 'text'}
+                        value={currentValue === 0 && field.data_type === 'number' ? '' : String(currentValue || '')}
+                        onChange={(e) => {
+                          let newValue: string | number = e.target.value;
+                          if (field.data_type === 'number') {
+                            newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                          }
+                          handleFieldChange(formId, field.label, newValue);
+                        }}
+                        placeholder={`Enter ${field.label}`}
+                        className="w-full"
+                      />
+                    ) : (
+                      <div className="text-sm text-gray-900 break-words font-mono bg-gray-50 p-2 rounded">
+                        {field.data_type === 'date' && field.value 
+                          ? new Date(String(field.value)).toLocaleDateString()
+                          : String(field.value)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          
+          {fieldEntries.length > 10 && (
+            <div className="text-center py-2 text-xs text-gray-500">
+              Showing 10 of {fieldEntries.length} fields
+            </div>
+          )}
+        </div>
+      );
+    } else {
+      // Legacy structure - simple key-value display
+      const entries = Object.entries(fields);
+      
+      if (entries.length === 0) {
+        return (
+          <div className="text-center py-8 text-gray-500">
+            <p>No field mappings available for this form</p>
+          </div>
+        );
+      }
+
+      // Show first 10 fields, then show count if more
+      const displayFields = entries.slice(0, 10);
+      
+      return (
+        <div className="space-y-3">
+          {displayFields.map(([key, value], index) => {
+            const currentValue = editedFieldsData[formId]?.[key] ?? value;
+            // Infer data type from value for legacy structure
+            const inferredType = typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'text';
+            const isBlank = isBlankValue(value, inferredType);
+            
+            return (
+              <div key={key || `field-${index}`} className="flex items-start justify-between py-2 border-b border-gray-200">
+                <div className="flex-1 min-w-0 mr-4">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs font-medium text-gray-700">{key}</Label>
+                    {isBlank && (
+                      <Badge variant="secondary" className="text-xs px-1 py-0 flex items-center gap-1">
+                        <Edit3 className="h-3 w-3" />
+                        Editable
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  {typeof value === 'boolean' ? (
+                    <div className="flex items-center">
+                      <Checkbox 
+                        checked={Boolean(currentValue)} 
+                        disabled={!isBlank}
+                        onCheckedChange={(checked) => {
+                          if (isBlank) {
+                            handleFieldChange(formId, key, checked);
+                          }
+                        }}
+                        className="mr-2" 
+                      />
+                      <span className="text-sm text-gray-600">{currentValue ? 'Yes' : 'No'}</span>
+                    </div>
+                  ) : isBlank ? (
+                    <Input
+                      type={typeof value === 'number' ? 'number' : 'text'}
+                      value={currentValue === 0 && typeof value === 'number' ? '' : String(currentValue || '')}
+                      onChange={(e) => {
+                        let newValue: string | number = e.target.value;
+                        if (typeof value === 'number') {
+                          newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                        }
+                        handleFieldChange(formId, key, newValue);
+                      }}
+                      placeholder={`Enter ${key}`}
+                      className="w-full"
+                    />
+                  ) : (
+                    <div className="text-sm text-gray-900 break-words">
+                      {String(value)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          
+          {entries.length > 10 && (
+            <div className="text-center py-2 text-xs text-gray-500">
+              Showing 10 of {entries.length} fields
+            </div>
+          )}
+        </div>
+      );
+    }
   };
 
   if (loading) {
@@ -395,18 +669,33 @@ export function PrefillPreviewPage() {
           <CardContent>
             <div className="space-y-2">
               {selectedFormItems.length > 0 ? (
-                selectedFormItems.map((form) => (
+                selectedFormItems.map((form, index) => (
                   <button
-                    key={form.form_id}
-                    onClick={() => setActiveFormId(form.form_id)}
+                    key={form.form_id || `form-${index}`}
+                    onClick={() => handleFormClick(form.form_id)}
+                    disabled={loadingFormIds.has(form.form_id)}
                     className={`w-full px-3 py-2 rounded-lg border text-sm text-left transition-colors ${
                       form.form_id === activeFormId
                         ? 'bg-green-100 text-green-800 border-green-200' 
                         : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-                    }`}
+                    } ${loadingFormIds.has(form.form_id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <div className="font-medium">{form.form_title}</div>
-                    <div className="text-xs text-gray-500">{form.form_id}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">{form.form_title}</div>
+                        <div className="text-xs text-gray-500">{form.form_id}</div>
+                      </div>
+                      {loadingFormIds.has(form.form_id) && (
+                        <div className="flex-shrink-0 ml-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                        </div>
+                      )}
+                      {form.form_id === activeFormId && !loadingFormIds.has(form.form_id) && (
+                        <div className="flex-shrink-0 ml-2">
+                          <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 ))
               ) : (
@@ -449,8 +738,17 @@ export function PrefillPreviewPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {/* Form Fields for Active Form */}
-            {activeFormId && (
+            {!activeFormId ? (
+              <div className="text-center py-12 text-gray-500">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p>Click on a form to view its fields</p>
+              </div>
+            ) : loadingFormIds.has(activeFormId) ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
+                <p className="text-gray-600">Loading form data...</p>
+              </div>
+            ) : (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -466,13 +764,25 @@ export function PrefillPreviewPage() {
                     {renderFormFields(activeFormId)}
                   </div>
                   
-                  {Object.keys(formFieldsData[activeFormId] || {}).length > 10 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 text-center">
-                        {Object.keys(formFieldsData[activeFormId] || {}).length} fields total
-                      </p>
-                    </div>
-                  )}
+                  {/* Field count - handle both new and legacy API structures */}
+                  {(() => {
+                    const mapping = formMappings[activeFormId];
+                    let totalFields = 0;
+                    
+                    if (mapping && Array.isArray(mapping.fields)) {
+                      totalFields = mapping.fields.length;
+                    } else {
+                      totalFields = Object.keys(formFieldsData[activeFormId] || {}).length;
+                    }
+                    
+                    return totalFields > 10 ? (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500 text-center">
+                          {totalFields} fields total
+                        </p>
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
               </div>
             )}

@@ -1,44 +1,44 @@
 {
   "FORM-001": {
     "pdf": "FORM-001_PRECON_NOTICE.pdf",
-    "fields": {
-      "NoticeDate": "2025-09-10",
-      "ContractorName": "ACME Construction Corp",
-      "ContractorAddress": "123 Main Street, Queens, NY 11375",
-      "ContractNo": "Q-2025-XYZ-001",
-      "DesignAndSupervision": "Design-Build",
-      "Funding": "City",
-      "MeetingDate": "2025-09-18",
-      "MeetingTime": "10:00 AM",
-      "MeetingPlace": "Olmsted Center, Conf Rm A"
-    }
+    "fields": [
+      { "map_id": "1", "label": "notice_date", "value": "2025-09-10", "source_col": "pi_notice_date", "data_type": "date", "display_order": 1 },
+      { "map_id": "2", "label": "contractor_name", "value": "ACME Construction Corp", "source_col": "pi_contractor_name", "data_type": "text", "display_order": 2 },
+      { "map_id": "3", "label": "contractor_address", "value": "123 Main Street, Queens, NY 11375", "source_col": "pi_contractor_address", "data_type": "text", "display_order": 3 },
+      { "map_id": "4", "label": "contract_no", "value": "Q-2025-XYZ-001", "source_col": "pi_park_contract_no", "data_type": "text", "display_order": 4 },
+      { "map_id": "5", "label": "design_supervision", "value": "Design-Build", "source_col": "pi_design_supervision", "data_type": "text", "display_order": 5 },
+      { "map_id": "6", "label": "funding", "value": "City", "source_col": "pi_funding_source", "data_type": "text", "display_order": 6 },
+      { "map_id": "7", "label": "meeting_date", "value": "2025-09-18", "source_col": "pi_meeting_date", "data_type": "date", "display_order": 7 },
+      { "map_id": "8", "label": "meeting_time", "value": "10:00 AM", "source_col": "pi_meeting_time", "data_type": "text", "display_order": 8 },
+      { "map_id": "9", "label": "meeting_place", "value": "Olmsted Center, Conf Rm A", "source_col": "pi_meeting_place", "data_type": "text", "display_order": 9 }
+    ]
   },
   "FORM-002": {
     "pdf": "FORM-002_STD_PRECON_INFO.pdf",
-    "fields": {
-      "ContractNo": "Q-2025-XYZ-001",
-      "AwardDate": "2024-08-15",
-      "Amount": 5000000,
-      "CCD": 365,
-      "DesignPM": "Jane Designer, PE",
-      "CD": "John Director",
-      "RE": "Alex Rodriguez, PE",
-      "RE_Email": "alex.rodriguez@parks.nyc.gov"
-    }
+    "fields": [
+      { "map_id": "10", "label": "contract_no", "value": "Q-2025-XYZ-001", "source_col": "pi_park_contract_no", "data_type": "text", "display_order": 1 },
+      { "map_id": "11", "label": "award_date", "value": "2024-08-15", "source_col": "pi_award_letter_date", "data_type": "date", "display_order": 2 },
+      { "map_id": "12", "label": "award_amount", "value": 5000000, "source_col": "pi_award_amount", "data_type": "number", "display_order": 3 },
+      { "map_id": "13", "label": "ccd", "value": 365, "source_col": "pi_ccd", "data_type": "number", "display_order": 4 },
+      { "map_id": "14", "label": "design_pm", "value": "Jane Designer, PE", "source_col": "pi_design_pm", "data_type": "text", "display_order": 5 },
+      { "map_id": "15", "label": "construction_director", "value": "John Director", "source_col": "pi_construction_director", "data_type": "text", "display_order": 6 },
+      { "map_id": "16", "label": "resident_engineer", "value": "Alex Rodriguez, PE", "source_col": "pi_resident_engineer", "data_type": "text", "display_order": 7 },
+      { "map_id": "17", "label": "resident_engineer_email", "value": "alex.rodriguez@parks.nyc.gov", "source_col": "pi_resident_engineer_email", "data_type": "text", "display_order": 8 }
+    ]
   },
   "FORM-003": {
     "pdf": "FORM-003_PRECON_CHECKLIST.pdf",
-    "fields": {
-      "ContractNo": "Q-2025-XYZ-001",
-      "TimeAllowedCCD": 365,
-      "ConstructionSupervision": "Design-Build",
-      "Design": "Jane Designer, PE",
-      "AwardDate": "2024-08-15",
-      "BidPrice": 5000000,
-      "Req_ProgressSchedule_Y": true,
-      "Insurance_CGL_Y": true,
-      "DoT_MPT_Y": false
-    }
+    "fields": [
+      { "map_id": "18", "label": "contract_no", "value": "Q-2025-XYZ-001", "source_col": "pi_park_contract_no", "data_type": "text", "display_order": 1 },
+      { "map_id": "19", "label": "time_allowed_ccd", "value": 365, "source_col": "pi_ccd", "data_type": "number", "display_order": 2 },
+      { "map_id": "20", "label": "construction_supervision", "value": "Design-Build", "source_col": "pi_construction_supervision", "data_type": "text", "display_order": 3 },
+      { "map_id": "21", "label": "design_pm", "value": "Jane Designer, PE", "source_col": "pi_design_pm", "data_type": "text", "display_order": 4 },
+      { "map_id": "22", "label": "award_date", "value": "2024-08-15", "source_col": "pi_award_letter_date", "data_type": "date", "display_order": 5 },
+      { "map_id": "23", "label": "bid_price", "value": 5000000, "source_col": "pi_award_amount", "data_type": "number", "display_order": 6 },
+      { "map_id": "24", "label": "req_progress_schedule", "value": true, "source_col": "pi_req_progress_schedule", "data_type": "boolean", "display_order": 7 },
+      { "map_id": "25", "label": "insurance_cgl", "value": true, "source_col": "pi_insurance_cgl", "data_type": "boolean", "display_order": 8 },
+      { "map_id": "26", "label": "dot_mpt", "value": false, "source_col": "pi_dot_mpt", "data_type": "boolean", "display_order": 9 }
+    ]
   },
   "FORM-005": {
     "pdf": "FORM-005_PRECON_MINUTES.pdf",

@@ -1,78 +1,78 @@
-import { httpGet } from '../../../services/api/http';
-import embeddedMappings, { type FormFieldMappings } from '../../../services/embedded_dataset/form_field_mappings';
+import { httpPost } from '../../../services/api/http';
+import { type FormFieldMappings, generateFormFieldMappings } from '../../../services/embedded_dataset/form_field_mappings';
+import type { Project } from '../../../features/projects/types';
 
 /**
  * Service for managing form field mappings
- * Provides fallback to embedded dataset when HTTP API fails
+ * Uses POST API with project context and embedded dataset fallback
  */
 class FormFieldMappingsService {
-  private cache: FormFieldMappings | null = null;
-  private cacheTimestamp = 0;
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   /**
-   * Get form field mappings from HTTP API with embedded fallback
+   * Get form field mappings with project context via POST API
+   * This method sends both form IDs and project data to get customized mappings
    */
-  async getMappings(): Promise<FormFieldMappings> {
-    // Return cached data if still fresh
-    if (this.cache && Date.now() - this.cacheTimestamp < this.CACHE_DURATION) {
-      return this.cache;
-    }
-
+  async getFormMappingsWithProject(formIds: string[], project?: Project): Promise<FormFieldMappings> {
     try {
-      console.log('FormFieldMappingsService: Attempting to fetch from HTTP API...');
+      console.log('FormFieldMappingsService: Attempting POST API with project context...');
       
-      const httpMappings = await httpGet<FormFieldMappings>('/form_field_mappings');
+      const requestBody = {
+        formIds,
+        projectId: project?.project_id || project?.id
+      };
       
-      console.log(`FormFieldMappingsService: Successfully loaded ${Object.keys(httpMappings).length} form mappings from HTTP API`);
+      console.log('📋 POST Request Body:', requestBody);
+      console.log('📋 Project details:', {
+        hasProject: !!project,
+        projectId: project?.project_id,
+        projectIdAlt: project?.id,
+        projectName: project?.name || project?.pi_short_description,
+        finalProjectId: requestBody.projectId
+      });
       
-      // Cache the result
-      this.cache = httpMappings;
-      this.cacheTimestamp = Date.now();
+      const httpMappings = await httpPost<FormFieldMappings>('/cfg/form_field_mappings', requestBody);
+      
+      console.log(`FormFieldMappingsService: Successfully loaded ${Object.keys(httpMappings).length} form mappings from POST API`);
       
       return httpMappings;
     } catch (error) {
-      console.warn('FormFieldMappingsService: HTTP API failed, falling back to embedded dataset:', error);
+      console.warn('FormFieldMappingsService: POST API failed, falling back to embedded dataset:', error);
       
-      // Use embedded dataset as fallback
-      this.cache = embeddedMappings;
-      this.cacheTimestamp = Date.now();
+      // Convert project data to embedded dataset format
+      const projectForEmbedded = project ? {
+        name: project.pi_short_description || project.name || 'Unknown Project',
+        id: project.project_id || project.id || 'unknown',
+        description: project.pi_short_description || project.description || '',
+        location: project.pi_park_name || project.location || '',
+        manager: project.pi_managing_design_team_unit || project.manager || '',
+        status: project.status || 'active',
+        startDate: project.startDate || '',
+        endDate: project.endDate || '',
+        budget: project.budget || 0,
+        progress: project.progress || 0
+      } : undefined;
       
-      return embeddedMappings;
+      // Generate embedded mappings with actual project data
+      const embeddedMappings = generateFormFieldMappings(projectForEmbedded);
+      console.log('📋 FormFieldMappingsService: Using embedded dataset with project data:', {
+        projectData: projectForEmbedded,
+        hasProjectData: !!projectForEmbedded,
+        mappingsGenerated: Object.keys(embeddedMappings).length
+      });
+      
+      // Filter for requested forms only
+      const result: FormFieldMappings = {};
+      formIds.forEach(formId => {
+        if (embeddedMappings[formId]) {
+          result[formId] = embeddedMappings[formId];
+        }
+      });
+      
+      return result;
     }
   }
 
-  /**
-   * Get mapping for a specific form ID
-   */
-  async getFormMapping(formId: string) {
-    const mappings = await this.getMappings();
-    return mappings[formId] || null;
-  }
 
-  /**
-   * Get mappings for multiple form IDs
-   */
-  async getFormMappings(formIds: string[]) {
-    const mappings = await this.getMappings();
-    const result: FormFieldMappings = {};
-    
-    formIds.forEach(formId => {
-      if (mappings[formId]) {
-        result[formId] = mappings[formId];
-      }
-    });
-    
-    return result;
-  }
-
-  /**
-   * Clear cache to force fresh data on next request
-   */
-  clearCache() {
-    this.cache = null;
-    this.cacheTimestamp = 0;
-  }
 }
 
 // Export singleton instance

@@ -1,5 +1,113 @@
 # API Documentation
 
+## Form Field Mappings API
+
+### Get Form Field Mappings with Project Context
+`POST /api/form_field_mappings`
+
+#### Headers
+```
+Content-Type: application/json
+Accept: application/json
+```
+
+#### Request Body
+```typescript
+{
+  "formIds": string[],               // Array of form IDs to get mappings for
+  "projectId"?: string               // Project ID for context (server will look up project details)
+}
+```
+
+#### Response
+```typescript
+{
+  [formId: string]: {
+    "pdf": string,                   // PDF template filename
+    "fields": FormFieldEntry[]       // Array of field mappings
+  }
+}
+
+interface FormFieldEntry {
+  "map_id": string,                  // Unique mapping ID
+  "label": string,                   // Field label/name
+  "value": string | number | boolean, // Field value
+  "source_col": string,              // Source column name in project data
+  "data_type": "text" | "number" | "boolean" | "date"  // Data type
+}
+```
+
+#### Example Request
+```json
+{
+  "formIds": ["FORM-001", "FORM-002", "FORM-003"],
+  "projectId": "M353-212M"
+}
+```
+
+#### Example Response
+```json
+{
+  "FORM-001": {
+    "pdf": "FORM-001_PRECON_NOTICE.pdf",
+    "fields": [
+      {
+        "map_id": "4",
+        "label": "contract_no",
+        "value": "M353-212M",
+        "source_col": "pi_park_contract_no",
+        "data_type": "text"
+      },
+      {
+        "map_id": "12",
+        "label": "award_amount",
+        "value": 5390900.00,
+        "source_col": "pi_award_amount",
+        "data_type": "number"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Get Single Form Field Mapping API (Optional)
+
+### Endpoint
+`GET /api/form_field_mappings/{formId}`
+
+### Headers
+```
+Accept: application/json
+```
+
+### Query Parameters
+- `projectId` (optional): Project ID for context
+
+### Example Request
+```
+GET /api/form_field_mappings/FORM-001?projectId=M353-212M
+```
+
+### Example Response
+```json
+{
+  "pdf": "FORM-001_PRECON_NOTICE.pdf",
+  "fields": [
+    {
+      "map_id": "4",
+      "label": "contract_no", 
+      "value": "M353-212M",
+      "source_col": "pi_park_contract_no",
+      "data_type": "text"
+    }
+  ]
+}
+```
+
+---
+
 ## Download Forms API
 
 ### Endpoint
