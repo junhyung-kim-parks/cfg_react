@@ -27,23 +27,34 @@ export function useFormSearch({
 
   const filteredAndSortedForms = useMemo(() => {
     let filtered = forms.filter(form => {
-      const matchesSearch = form.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-                           form.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      const matchesCategory = category === 'all' || form.category === category;
-      const matchesStatus = status === 'all' || form.status === status;
+      const matchesSearch = form.form_title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           form.form_description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           form.form_id.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || form.form_category === category;
+      const matchesStatus = status === 'all' || form.form_status.toLowerCase() === status.toLowerCase();
       
       return matchesSearch && matchesCategory && matchesStatus;
     });
 
     // Sort
     filtered.sort((a, b) => {
-      let aValue: string | number = a[sortBy];
-      let bValue: string | number = b[sortBy];
+      let aValue: string | number | undefined;
+      let bValue: string | number | undefined;
       
-      if (sortBy === 'updatedAt') {
-        aValue = new Date(aValue as string).getTime();
-        bValue = new Date(bValue as string).getTime();
+      if (sortBy === 'title') {
+        aValue = a.form_title;
+        bValue = b.form_title;
+      } else if (sortBy === 'category') {
+        aValue = a.form_category;
+        bValue = b.form_category;
+      } else if (sortBy === 'updatedAt') {
+        aValue = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        bValue = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
       }
+      
+      // Handle undefined values
+      if (aValue === undefined) aValue = '';
+      if (bValue === undefined) bValue = '';
       
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();

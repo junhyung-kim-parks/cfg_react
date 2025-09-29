@@ -91,23 +91,23 @@ export function FormLibraryPage() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(form => 
-        form.id.toLowerCase().includes(query) ||
-        form.title.toLowerCase().includes(query) ||
-        form.description?.toLowerCase().includes(query) ||
-        form.category.toLowerCase().includes(query)
+        form.form_id.toLowerCase().includes(query) ||
+        form.form_title.toLowerCase().includes(query) ||
+        form.form_description?.toLowerCase().includes(query) ||
+        form.form_category.toLowerCase().includes(query)
       );
     }
 
     // Filter by category
     if (selectedCategory && selectedCategory !== 'All Categories') {
-      filtered = filtered.filter(form => form.category === selectedCategory);
+      filtered = filtered.filter(form => form.form_category === selectedCategory);
     }
 
     setFilteredForms(filtered);
   };
 
   const getCategories = () => {
-    const categories = ['All Categories', ...Array.from(new Set(forms.map(form => form.category)))];
+    const categories = ['All Categories', ...Array.from(new Set(forms.map(form => form.form_category)))];
     return categories;
   };
 
@@ -130,8 +130,8 @@ export function FormLibraryPage() {
     setIsFieldEditorOpen(true);
     
     try {
-      const mappings = await formFieldMappingsService.getFormMappings([form.id]);
-      const mapping = mappings[form.id];
+      const mappings = await formFieldMappingsService.getFormMappings([form.form_id]);
+      const mapping = mappings[form.form_id];
       
       if (mapping) {
         setFormMapping(mapping);
@@ -183,7 +183,7 @@ export function FormLibraryPage() {
 
   const handleSaveFields = () => {
     // In a real application, this would save to the backend
-    console.log('Saving field definitions for', selectedForm?.id, ':', fieldDefinitions);
+    console.log('Saving field definitions for', selectedForm?.form_id, ':', fieldDefinitions);
     
     // Update the form mapping
     if (formMapping) {
@@ -244,11 +244,11 @@ export function FormLibraryPage() {
     
     setIsUploadDialogOpen(true);
     setUploadData({
-      id: selectedForm.id,
-      title: selectedForm.title,
-      category: selectedForm.category,
-      description: selectedForm.description || '',
-      templateType: selectedForm.templateType || 'PDF',
+      id: selectedForm.form_id,
+      title: selectedForm.form_title,
+      category: selectedForm.form_category,
+      description: selectedForm.form_description || '',
+      templateType: selectedForm.form_template_type || 'PDF',
       file: null
     });
     setUploadError(null);
@@ -318,8 +318,8 @@ export function FormLibraryPage() {
     if (!uploadData.category.trim()) return 'Category is required';
     
     // Check if ID already exists (only for new templates, not replacements)
-    const isReplacement = selectedForm && selectedForm.id === uploadData.id;
-    if (!isReplacement && forms.some(form => form.id.toLowerCase() === uploadData.id.toLowerCase())) {
+    const isReplacement = selectedForm && selectedForm.form_id === uploadData.id;
+    if (!isReplacement && forms.some(form => form.form_id.toLowerCase() === uploadData.id.toLowerCase())) {
       return 'A template with this ID already exists';
     }
 
@@ -340,7 +340,7 @@ export function FormLibraryPage() {
     setUploadProgress(0);
 
     // Determine if this is a replacement operation
-    const isReplacement = selectedForm && selectedForm.id === uploadData.id;
+    const isReplacement = selectedForm && selectedForm.form_id === uploadData.id;
 
     try {
       // Simulate upload progress
@@ -370,7 +370,7 @@ export function FormLibraryPage() {
       // Add to forms list or replace existing
       if (isReplacement) {
         setForms(prev => prev.map(form => 
-          form.id === uploadData.id ? newForm : form
+          form.form_id === uploadData.id ? newForm : form
         ));
       } else {
         setForms(prev => [newForm, ...prev]);
@@ -459,32 +459,32 @@ export function FormLibraryPage() {
       {/* Forms Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredForms.map((form) => (
-          <Card key={form.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+          <Card key={form.form_id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               {/* Header with ID and Type Badge */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="text-base text-gray-900 mb-1">{form.id}</h3>
-                  <p className="text-sm text-gray-700 line-clamp-2 mb-3">{form.title}</p>
+                  <h3 className="text-base text-gray-900 mb-1">{form.form_id}</h3>
+                  <p className="text-sm text-gray-700 line-clamp-2 mb-3">{form.form_title}</p>
                 </div>
                 <Badge 
                   variant="outline"
-                  className={`ml-2 text-xs px-2 py-1 ${getTemplateTypeColor(form.templateType || 'PDF')}`}
+                  className={`ml-2 text-xs px-2 py-1 ${getTemplateTypeColor(form.form_template_type || 'PDF')}`}
                 >
-                  {form.templateType || 'PDF'}
+                  {form.form_template_type || 'PDF'}
                 </Badge>
               </div>
 
               {/* Form Details */}
               <div className="space-y-2 mb-4">
                 <div className="text-xs text-gray-600">
-                  <span className="font-medium">Category:</span> {form.category}
+                  <span className="font-medium">Category:</span> {form.form_category}
                 </div>
                 <div className="text-xs text-gray-600">
                   <span className="font-medium">Fields:</span> {form.fieldCount || 0}
                 </div>
                 <div className="text-xs text-gray-600">
-                  <span className="font-medium">Version:</span> {form.version || '1.0'}
+                  <span className="font-medium">Version:</span> {form.form_version || '1.0'}
                 </div>
               </div>
 
@@ -554,7 +554,7 @@ export function FormLibraryPage() {
                 <SheetDescription>
                   {selectedForm && (
                     <>
-                      Edit field mappings for <strong>{selectedForm.id}</strong> - {selectedForm.title}
+                      Edit field mappings for <strong>{selectedForm.form_id}</strong> - {selectedForm.form_title}
                     </>
                   )}
                 </SheetDescription>

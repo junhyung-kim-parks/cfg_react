@@ -10,14 +10,16 @@ interface FormCardProps {
 }
 
 export function FormCard({ form, onEdit }: FormCardProps) {
-  const formattedDate = new Date(form.updatedAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
+  const formattedDate = form.updatedAt 
+    ? new Date(form.updatedAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    : 'N/A';
 
-  const getStatusVariant = (status: FormItem['status']) => {
-    switch (status) {
+  const getStatusVariant = (status: FormItem['form_status']) => {
+    switch (status.toLowerCase()) {
       case 'active':
         return 'default';
       case 'draft':
@@ -35,17 +37,17 @@ export function FormCard({ form, onEdit }: FormCardProps) {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-muted-foreground" />
-            <h3 className="font-medium text-card-foreground">{form.title}</h3>
+            <h3 className="font-medium text-card-foreground">{form.form_title}</h3>
           </div>
-          <Badge variant={getStatusVariant(form.status)} className="capitalize">
-            {form.status}
+          <Badge variant={getStatusVariant(form.form_status)} className="capitalize">
+            {form.form_status}
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {form.description}
+          {form.form_description}
         </p>
         
         <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -53,15 +55,18 @@ export function FormCard({ form, onEdit }: FormCardProps) {
             <Calendar className="h-3 w-3" />
             <span>Updated {formattedDate}</span>
           </div>
-          <span>{form.fields} fields</span>
+          <span>{form.fieldCount || 0} fields</span>
         </div>
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              {form.category}
+              {form.form_category}
             </Badge>
-            <span className="text-xs text-muted-foreground">v{form.version}</span>
+            <Badge variant="secondary" className="text-xs">
+              {form.form_phase}
+            </Badge>
+            <span className="text-xs text-muted-foreground">v{form.form_version}</span>
           </div>
           
           {onEdit && (

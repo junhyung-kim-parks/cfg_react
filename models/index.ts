@@ -1,16 +1,15 @@
 export interface FormItem {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  status: 'Active' | 'Draft' | 'Archived' | 'active' | 'draft' | 'archived';
-  version: string;
-  fieldCount?: number; // New field from your data
-  fields?: number; // Keep for backward compatibility
-  // New fields from your data
-  phase?: string;
-  templateType?: string;
-  // Optional timestamp fields
+  form_id: string;
+  form_title: string;
+  form_description: string;
+  form_category: string;
+  form_status: 'Active' | 'Draft' | 'Archived' | 'active' | 'draft' | 'archived';
+  form_version: string;
+  form_phase: string;
+  form_template_type: string;
+  form_file_path: string;
+  // Optional fields for backward compatibility or additional data
+  fieldCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }

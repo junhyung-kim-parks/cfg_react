@@ -267,27 +267,7 @@ export function PrefillPreviewPage() {
     setIsDownloading(true);
     try {
       const selectedFormIds = selectedFormItems.map(form => form.form_id);
-      
-      // Prepare project data for the download request
-      const projectData = prefillData?.project ? {
-        name: prefillData.project.pi_short_description || prefillData.project.name || 'Unknown Project',
-        id: prefillData.project.project_id || prefillData.project.id || 'unknown',
-        manager: prefillData.project.pi_managing_design_team_unit || prefillData.project.manager || 'Unknown Manager',
-        location: prefillData.project.pi_park_name || prefillData.project.location || 'Unknown Location'
-      } : undefined;
-
-      console.log('📄 PrefillPreviewPage: Initiating download with data:', {
-        formIds: selectedFormIds,
-        projectData,
-        fieldsDataKeys: Object.keys(formFieldsData)
-      });
-
-      // Use the new download API with project data
-      const result = await downloadTemplate({
-        formIds: selectedFormIds,
-        formFieldsData,
-        projectData
-      });
+      const result = await downloadTemplate(selectedFormIds, formFieldsData);
       
       if (result.success) {
         toast.success(`Downloaded ${result.downloadedFiles} file(s) successfully`);
@@ -488,6 +468,17 @@ export function PrefillPreviewPage() {
         <Button variant="outline" onClick={navigateToFormPicker}>
           ← Back
         </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            className="border-green-600 text-green-600 hover:bg-green-50 flex items-center gap-2"
+            onClick={handleDownloadTemplate}
+            disabled={isDownloading || !selectedFormItems.length}
+          >
+            <Download className="h-4 w-4" />
+            {isDownloading ? 'Downloading...' : 'Download Template'}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter,Link } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { HomePage } from './pages/HomePage';
 import { ProjectSearchPage } from './pages/ProjectSearchPage';
@@ -17,12 +17,12 @@ function NotFoundPage() {
     <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6">
       <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>
       <p className="text-muted-foreground mb-6">Page not found</p>
-      <a 
-        href="/" 
+       <Link
+        to="/"
         className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-      >
-        Go to Home
-      </a>
+        >
+          Go to Home
+      </Link>
     </div>
   );
 }
@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />, // Dashboard - accessible without login
+        element: <HomePage />,
       },
       {
         path: 'forms/project-search',

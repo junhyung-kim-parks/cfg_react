@@ -18,7 +18,7 @@ export async function list(): Promise<FormItem[]> {
   
   try {
     console.log('📋 FormsService: Attempting HTTP request to /formCatalog');
-    const data = await httpGet<FormCatalog>('/formCatalog');
+    const data = await httpGet<FormCatalog>('/cfg/formCatalog');
     console.log('📋 FormsService: HTTP request successful, data received:', !!data);
     console.log('📋 FormsService: HTTP data type:', typeof data);
     console.log('📋 FormsService: HTTP data has forms property:', !!(data && data.forms));
@@ -42,7 +42,7 @@ export async function list(): Promise<FormItem[]> {
   console.log('📋 FormsService: formCatalogData type:', typeof formCatalogData);
   console.log('📋 FormsService: formCatalogData is array:', Array.isArray(formCatalogData));
   console.log('📋 FormsService: formCatalogData length:', formCatalogData?.length);
-  console.log('📋 FormsService: formCatalogData first item:', formCatalogData?.[0]?.id);
+  console.log('📋 FormsService: formCatalogData first item:', formCatalogData?.[0]?.form_id);
   
   // Ensure we always return a valid array
   if (Array.isArray(formCatalogData) && formCatalogData.length > 0) {
@@ -87,18 +87,20 @@ export async function uploadTemplate(data: UploadTemplateData): Promise<FormItem
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const newForm: FormItem = {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      templateType: data.templateType,
+      form_id: data.id,
+      form_title: data.title,
+      form_description: data.description,
+      form_category: data.category,
+      form_template_type: data.templateType,
+      form_status: 'Draft',
+      form_phase: 'Construction',
+      form_version: '1.0',
+      form_file_path: `/forms/${data.id}.${data.templateType.toLowerCase()}`,
       fieldCount: Math.floor(Math.random() * 20) + 5, // Random field count for demo
-      version: '1.0',
-      lastModified: new Date().toISOString().split('T')[0],
-      lastModifiedBy: 'Current User'
+      updatedAt: new Date().toISOString()
     };
 
-    console.log('📋 FormsService: ✅ Template upload successful:', newForm.id);
+    console.log('📋 FormsService: ✅ Template upload successful:', newForm.form_id);
     return newForm;
 
   } catch (error) {

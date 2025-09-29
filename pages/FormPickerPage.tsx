@@ -95,9 +95,10 @@ export function FormPickerPage() {
       setFilteredForms(forms);
     } else {
       const filtered = forms.filter(form =>
-        form.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        form.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        form.category.toLowerCase().includes(searchTerm.toLowerCase())
+        form.form_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        form.form_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        form.form_category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        form.form_id.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredForms(filtered);
     }
@@ -189,7 +190,7 @@ export function FormPickerPage() {
   };
 
   const getSelectedFormItems = () => {
-    return forms.filter(form => selectedForms.includes(form.id));
+    return forms.filter(form => selectedForms.includes(form.form_id));
   };
 
   const formatCurrency = (amount: number) => {
@@ -391,21 +392,21 @@ export function FormPickerPage() {
                         <div className="space-y-2 max-h-60 overflow-y-auto">
                           {getSelectedFormItems().map((form) => (
                             <div
-                              key={form.id}
+                              key={form.form_id}
                               className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
                             >
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                  {form.title}
+                                  {form.form_title}
                                 </p>
                                 <p className="text-xs text-gray-500 truncate">
-                                  {form.id} • {form.category}
+                                  {form.form_id} • {form.form_category}
                                 </p>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removeSelectedForm(form.id)}
+                                onClick={() => removeSelectedForm(form.form_id)}
                                 className="ml-2 h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
                               >
                                 <X className="h-3 w-3" />
@@ -426,15 +427,15 @@ export function FormPickerPage() {
                 <span className="text-sm text-gray-600">Selected:</span>
                 {getSelectedFormItems().map((form) => (
                   <Badge 
-                    key={form.id}
+                    key={form.form_id}
                     variant="secondary"
                     className="flex items-center gap-1 bg-green-100 text-green-800 border-green-200"
                   >
-                    <span className="truncate max-w-[150px]">{form.title}</span>
+                    <span className="truncate max-w-[150px]">{form.form_title}</span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeSelectedForm(form.id)}
+                      onClick={() => removeSelectedForm(form.form_id)}
                       className="h-3 w-3 p-0 ml-1 text-green-600 hover:text-green-800"
                     >
                       <X className="h-2 w-2" />
@@ -459,7 +460,7 @@ export function FormPickerPage() {
                     {selectedForms.length} forms selected
                   </h4>
                   <p className="text-xs text-blue-700">
-                    {getSelectedFormItems().slice(0, 2).map(f => f.title).join(', ')}
+                    {getSelectedFormItems().slice(0, 2).map(f => f.form_title).join(', ')}
                     {selectedForms.length > 2 && ` and ${selectedForms.length - 2} more...`}
                   </p>
                 </div>
@@ -488,21 +489,21 @@ export function FormPickerPage() {
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {getSelectedFormItems().map((form) => (
                           <div
-                            key={form.id}
+                            key={form.form_id}
                             className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
-                                {form.title}
+                                {form.form_title}
                               </p>
                               <p className="text-xs text-gray-500 truncate">
-                                {form.id} • {form.category}
+                                {form.form_id} • {form.form_category}
                               </p>
                             </div>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeSelectedForm(form.id)}
+                              onClick={() => removeSelectedForm(form.form_id)}
                               className="ml-2 h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
                             >
                               <X className="h-3 w-3" />
@@ -531,13 +532,13 @@ export function FormPickerPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {!loading && filteredForms && filteredForms.length > 0 ? filteredForms.map((form) => (
           <Card 
-            key={form.id} 
+            key={form.form_id} 
             className={`cursor-pointer transition-all hover:shadow-md ${
-              selectedForms.includes(form.id) 
+              selectedForms.includes(form.form_id) 
                 ? 'ring-2 ring-green-600 bg-green-50' 
                 : 'hover:shadow-lg'
             }`}
-            onClick={() => toggleFormSelection(form.id)}
+            onClick={() => toggleFormSelection(form.form_id)}
           >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
@@ -546,12 +547,12 @@ export function FormPickerPage() {
                     <FileText className="h-5 w-5 text-gray-600" />
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-900 line-clamp-1">{form.title}</h4>
-                    <p className="text-xs text-gray-500">{form.id}</p>
+                    <h4 className="text-sm text-gray-900 line-clamp-1">{form.form_title}</h4>
+                    <p className="text-xs text-gray-500">{form.form_id}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {selectedForms.includes(form.id) && (
+                  {selectedForms.includes(form.form_id) && (
                     <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">✓</span>
                     </div>
@@ -559,28 +560,28 @@ export function FormPickerPage() {
                 </div>
               </div>
               
-              <p className="text-xs text-gray-600 mb-3 line-clamp-2">{form.description}</p>
+              <p className="text-xs text-gray-600 mb-3 line-clamp-2">{form.form_description}</p>
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
-                    {form.category}
+                    {form.form_category}
                   </Badge>
-                  {form.phase && (
+                  {form.form_phase && (
                     <Badge variant="secondary" className="text-xs">
-                      {form.phase}
+                      {form.form_phase}
                     </Badge>
                   )}
-                  {form.templateType && (
+                  {form.form_template_type && (
                     <Badge 
                       variant="outline" 
                       className={`text-xs ${
-                        form.templateType === 'Excel' 
+                        form.form_template_type === 'Excel' 
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : 'bg-blue-50 text-blue-700 border-blue-200'
                       }`}
                     >
-                      {form.templateType}
+                      {form.form_template_type}
                     </Badge>
                   )}
                 </div>

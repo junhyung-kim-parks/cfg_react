@@ -5,15 +5,21 @@ import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { useProject } from '../../contexts/ProjectContext';
+import { useFormGenerator } from '../../contexts/FormGeneratorContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoginModal } from '../auth/LoginModal';
 import styles from './TopHeader.module.css';
 
 export function TopHeader() {
   console.log('TopHeader: Rendering header...');
-  const { selectedProject, isProjectSelected } = useProject();
+  const { selectedProject: projectContextProject, isProjectSelected: isProjectContextSelected } = useProject();
+  const { state: formGeneratorState } = useFormGenerator();
   const { user, isLoggedIn, logout } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Get project info from either context (FormGenerator takes priority)
+  const selectedProject = formGeneratorState.selectedProject || projectContextProject;
+  const isProjectSelected = !!selectedProject || isProjectContextSelected;
   
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -44,8 +50,12 @@ export function TopHeader() {
             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
               <Building2 className="h-4 w-4 text-green-600" />
               <div className="text-sm">
-                <p className="text-green-800 font-medium">{selectedProject.pl_short_description}</p>
-                <p className="text-green-600 text-xs">{selectedProject.pl_park_name}</p>
+                <p className="text-green-800 font-medium">
+                  {selectedProject.pi_short_description || selectedProject.name || selectedProject.description || 'Selected Project'}
+                </p>
+                <p className="text-green-600 text-xs">
+                  {selectedProject.pi_park_name || selectedProject.location || selectedProject.id || ''}
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">
                 Selected
