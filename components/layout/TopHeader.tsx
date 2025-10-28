@@ -73,12 +73,19 @@ export function TopHeader() {
                     <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">{user.initials}</span>
                     </div>
-                    <div className="text-sm">
-                      <p className="text-muted-foreground">Logged in as: {user.email}</p>
+                    <div className="text-left text-sm">
+                      <p className="text-foreground font-medium">{user.name}</p>
+                      <p className="text-muted-foreground text-xs">{user.email}</p>
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Role: {user.role}</p>
+                  </div>
+                  <div className="border-t my-1"></div>
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout

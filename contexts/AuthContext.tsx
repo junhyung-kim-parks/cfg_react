@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User } from '../features/users/types';
 import { generateUsers } from '../services/embedded_dataset/users';
-import { authService } from '../services/api/auth';
+import { authService, type ApiUserProfile } from '../services/api/auth';
 import { setAccessToken } from '../services/api/http';
 
 interface UserWithInitials extends User {
@@ -18,6 +18,33 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+/**
+ * Convert API profile to internal User format
+ */
+function apiProfileToUser(profile: ApiUserProfile): User {
+  const name = `${profile.first_name} ${profile.last_name}`;
+  
+  return {
+    id: profile.userid,
+    name,
+    email: profile.email,
+    role: 'Editor', // Default role - backend should provide this if needed
+    status: 'Active',
+    permissions: {
+      form_generate: true,
+      form_modify_templates: false,
+      form_upload_templates: false,
+      form_batch_process: true,
+      user_management: false,
+      audit_logs: false,
+      settings: false,
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    department: 'Parks Department', // Default - backend should provide this
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserWithInitials | null>(null);
@@ -37,12 +64,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Try to refresh the access token using the refresh token cookie
       await authService.refresh();
       
-      // If successful, we have a valid session but no user profile yet
-      // You might want to call a /auth/me endpoint here to get user profile
-      console.log('🔐 AuthContext: ✅ Session restored successfully');
+      // Session is valid, but we don't have user profile yet
+      // Options:
+      // 1. Backend could include profile in refresh response
+      // 2. Frontend could call GET /auth/me to fetch profile
+      // 3. Store profile in sessionStorage (for this page session only)
       
-      // For now, we'll just mark as not loading
-      // The user will need to be fetched separately or included in refresh response
+      // For now, check if we have profile in sessionStorage
+      const storedProfile = sessionStorage.getItem('user_profile');
+      if (storedProfile) {
+        const profile = JSON.parse(storedProfile) as ApiUserProfile;
+        const user = apiProfileToUser(profile);
+        const fullName = `${profile.first_name} ${profile.last_name}`;
+        setUser({ ...user, initials: getInitials(fullName) });
+        console.log('🔐 AuthContext: ✅ Session restored from sessionStorage');
+      } else {
+        console.log('🔐 AuthContext: ⚠️ Session valid but no user profile - login required');
+      }
     } catch (error) {
       console.log('🔐 AuthContext: ⚠️ No valid session found');
       setUser(null);
@@ -70,11 +108,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (response.profile) {
         console.log('🔐 AuthContext: ✅ HTTP API login successful for user:', response.profile.email);
+        console.log('🔐 AuthContext: User ID:', response.profile.userid);
+        console.log('🔐 AuthContext: Username:', response.profile.username);
         console.log('🔐 AuthContext: Access token stored in memory');
         console.log('🔐 AuthContext: Refresh token stored in HttpOnly cookie (automatic)');
         console.log('🔐 AuthContext: XSRF token stored in cookie for CSRF protection');
         
-        setUser({ ...response.profile, initials: getInitials(response.profile.name) });
+        // Store profile in sessionStorage for session restoration
+        sessionStorage.setItem('user_profile', JSON.stringify(response.profile));
+        
+        // Convert API profile to internal User format
+        const user = apiProfileToUser(response.profile);
+        const fullName = `${response.profile.first_name} ${response.profile.last_name}`;
+        
+        setUser({ 
+          ...user, 
+          initials: getInitials(fullName) 
+        });
         return true;
       }
     } catch (error) {
@@ -120,6 +170,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Always clear local state regardless of server response
     console.log('🔐 AuthContext: Clearing local user state');
     setUser(null);
+    
+    // Clear profile from sessionStorage
+    sessionStorage.removeItem('user_profile');
     
     // Access token is already cleared by authService.logout()
     console.log('🔐 AuthContext: ✅ Logout completed');

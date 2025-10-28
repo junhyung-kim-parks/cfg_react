@@ -6,10 +6,19 @@ export interface LoginRequest {
   password: string;
 }
 
+// API returns this profile structure
+export interface ApiUserProfile {
+  userid: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
 export interface LoginResponse {
   access: string;           // JWT access token (short-lived)
-  profile: User;           // User profile data
-  xsrfHeader?: string;     // CSRF header name (e.g., "X-CSRF-Token")
+  profile: ApiUserProfile;  // User profile data from API
+  xsrfHeader?: string;      // CSRF header name (e.g., "X-CSRF-Token")
 }
 
 export interface RefreshResponse {
