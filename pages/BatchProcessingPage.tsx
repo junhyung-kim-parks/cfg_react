@@ -79,22 +79,21 @@ export function BatchProcessingPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6"> {/* mobile-only: reduced padding */}
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 lg:gap-0"> {/* mobile-only: stack on mobile */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl lg:text-2xl font-medium text-foreground">Batch Processing</h1> {/* mobile-only: smaller heading */}
-          <p className="text-muted-foreground mt-1 text-sm lg:text-base"> {/* mobile-only: smaller text */}
+          <h1 className="text-2xl font-medium text-foreground">Batch Processing</h1>
+          <p className="text-muted-foreground mt-1">
             Monitor and manage batch form generation jobs
           </p>
         </div>
         
-        <div className="flex items-center gap-2 w-full lg:w-auto"> {/* mobile-only: full width */}
+        <div className="flex items-center gap-2">
           <Button
             onClick={handleRefresh}
             variant="outline"
             disabled={loading || statsLoading}
-            className="min-h-[44px] lg:min-h-0 text-sm lg:text-base" /* mobile-only: touch target */
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading || statsLoading ? 'animate-spin' : ''}`} />
             Refresh

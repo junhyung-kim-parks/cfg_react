@@ -253,22 +253,22 @@ export function FormPickerPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-gray-50 min-h-full"> {/* mobile-only: reduced padding */}
+    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
       {/* Header with Back Button and Next Button */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 lg:gap-0"> {/* mobile-only: stack on mobile */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4 w-full lg:w-auto"> {/* mobile-only: stack button and text */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
             size="sm"
             onClick={navigateToProjectSearch}
-            className="flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base" /* mobile-only: touch target */
+            className="flex items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
             Back to Projects
           </Button>
           <div>
-            <h1 className="text-xl lg:text-2xl text-gray-900">Form Picker</h1> {/* mobile-only: smaller heading */}
-            <p className="text-sm lg:text-base text-gray-600">Pick one or more forms to generate for this project</p> {/* mobile-only: smaller text */}
+            <h1 className="text-2xl text-gray-900">Form Picker</h1>
+            <p className="text-gray-600">Pick one or more forms to generate for this project</p>
           </div>
         </div>
 
@@ -276,7 +276,7 @@ export function FormPickerPage() {
         {selectedForms.length > 0 && (
           <Button 
             onClick={proceedToPreview}
-            className="bg-green-600 hover:bg-green-700 flex items-center gap-2 w-full lg:w-auto min-h-[44px] lg:min-h-0 text-sm lg:text-base" /* mobile-only: full width + touch target */
+            className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
           >
             Next to Prefill Preview
             <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
@@ -289,7 +289,7 @@ export function FormPickerPage() {
       {/* Selected Project Information */}
       {selectedProject && (
         <Card className="border-l-4 border-l-green-600 bg-green-50">
-          <CardContent className="p-4 lg:p-6"> {/* mobile-only: reduced padding */}
+          <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">

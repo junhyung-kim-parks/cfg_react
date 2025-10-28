@@ -1,5 +1,6 @@
 {
-  "user": {
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTAwMSIsInVzZXJuYW1lIjoiam9obi5kb2UiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MDU0MTM4MjIsImV4cCI6MTcwNTQxNDcyMn0.mock-signature",
+  "profile": {
     "id": "user-001",
     "name": "John Doe",
     "email": "john.doe@parks.nyc.gov",
@@ -20,6 +21,5 @@
     "department": "NYC Parks & Recreation",
     "phone": "+1 (555) 0123"
   },
-  "token": "mock-jwt-token-12345",
-  "message": "Login successful"
+  "xsrfHeader": "X-CSRF-Token"
 }

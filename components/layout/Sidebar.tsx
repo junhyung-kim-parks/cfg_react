@@ -276,9 +276,8 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar - hidden on mobile */}
-      <aside className="hidden lg:flex w-64 min-h-screen bg-sidebar border-r border-sidebar-border">
-        <div className="p-4 h-full w-full">
+      <aside className="w-64 min-h-screen bg-sidebar border-r border-sidebar-border">
+        <div className="p-4 h-full">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
               <img 

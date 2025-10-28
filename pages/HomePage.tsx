@@ -68,10 +68,10 @@ export function HomePage() {
 
   if (loading) {
     return (
-      <div className="p-4 lg:p-6"> {/* mobile-only: reduced padding */}
+      <div className="p-6">
         <div className="animate-pulse">
           <div className="h-8 bg-muted rounded mb-6 w-64"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"> {/* mobile-only: reduced gap */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 bg-muted rounded"></div>
             ))}
@@ -82,16 +82,16 @@ export function HomePage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6"> {/* mobile-only: reduced padding and spacing */}
+    <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Construction Form Generator</h1> {/* mobile-only: smaller heading */}
-        <p className="text-muted-foreground mt-2 text-sm lg:text-base"> {/* mobile-only: smaller text */}
+        <h1 className="text-3xl font-bold text-foreground">Construction Form Generator</h1>
+        <p className="text-muted-foreground mt-2">
           Welcome to your dashboard. Here's an overview of your form generation activities.
         </p>
       </div>
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"> {/* mobile-only: reduced gap */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Forms Generated Card */}
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardHeader className="pb-3">
@@ -169,19 +169,19 @@ export function HomePage() {
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4"> {/* mobile-only: reduced gap */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button 
               onClick={handleCreateNewForm}
-              className="p-4 text-left rounded-lg border border-border hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-[44px]" /* mobile-only: touch target */
+              className="p-4 text-left rounded-lg border border-border hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
-              <div className="font-semibold text-foreground text-base">Create New Form</div>
+              <div className="font-semibold text-foreground">Create New Form</div>
               <div className="text-sm text-muted-foreground mt-1">Start by selecting a project</div>
             </button>
             <button 
               onClick={handleBatchProcessing}
-              className="p-4 text-left rounded-lg border border-border hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-[44px]" /* mobile-only: touch target */
+              className="p-4 text-left rounded-lg border border-border hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
-              <div className="font-semibold text-foreground text-base">Batch Processing</div>
+              <div className="font-semibold text-foreground">Batch Processing</div>
               <div className="text-sm text-muted-foreground mt-1">Process multiple forms at once</div>
             </button>
           </div>

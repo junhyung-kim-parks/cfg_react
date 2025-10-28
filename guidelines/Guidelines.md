@@ -837,6 +837,47 @@ Use consistent emoji prefixes for easy filtering:
 PROTECTED ROUTES & AUTHENTICATION
 ==================================================
 
+## JWT + CSRF + LDAP Authentication System
+
+**⚠️ IMPORTANT: See AUTH_FLOW.md for complete authentication documentation**
+
+This application implements a secure authentication system with:
+
+- **Access Token (AT)**: Short-lived JWT stored in memory (React state)
+- **Refresh Token (RT)**: Long-lived JWT in HttpOnly + Secure cookie
+- **XSRF Token**: CSRF protection via double-submit cookie pattern
+- **LDAP Integration**: Backend validates against Active Directory
+
+### Key Security Features
+
+1. **No localStorage**: Access tokens stored in memory only (prevents XSS)
+2. **HttpOnly Cookies**: Refresh tokens inaccessible to JavaScript
+3. **Auto-Refresh**: 401 responses trigger automatic token refresh
+4. **Token Rotation**: Refresh tokens are one-time use (prevents replay)
+5. **CSRF Protection**: All state-changing operations require XSRF token
+
+### Authentication Flow Summary
+
+```
+Login → AT (memory) + RT (cookie) + XSRF (cookie)
+  ↓
+API Call → Authorization: Bearer {AT} + X-CSRF-Token: {XSRF}
+  ↓
+401 Error → Auto-refresh with RT cookie
+  ↓
+New AT → Retry original request
+  ↓
+Logout → Clear AT + Revoke RT on server
+```
+
+### Implementation Files
+
+- `services/api/http.ts` - Auto-inject Auth & CSRF headers
+- `services/api/auth.ts` - Login/logout/refresh endpoints
+- `contexts/AuthContext.tsx` - Store AT in memory, manage user state
+- `utils/csrf.ts` - Read XSRF token from cookie
+- `AUTH_FLOW.md` - Complete documentation
+
 ### ProtectedRoute Component:
 
 ```typescript

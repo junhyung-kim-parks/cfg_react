@@ -712,38 +712,38 @@ export function PrefillPreviewPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-gray-50 min-h-full"> {/* mobile-only: reduced padding */}
+    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"> {/* mobile-only: stack on mobile */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4 w-full lg:w-auto"> {/* mobile-only: stack button and text */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
             size="sm"
             onClick={navigateToFormPicker}
-            className="flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base" /* mobile-only: touch target */
+            className="flex items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
           </Button>
           <div>
-            <h1 className="text-xl lg:text-2xl text-gray-900">Prefill Preview</h1> {/* mobile-only: smaller heading */}
-            <p className="text-sm lg:text-base text-gray-600">Review the values that will be written into the PDF fields</p> {/* mobile-only: smaller text */}
+            <h1 className="text-2xl text-gray-900">Prefill Preview</h1>
+            <p className="text-gray-600">Review the values that will be written into the PDF fields</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6"> {/* mobile-only: reduced gap */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Selected Forms Section */}
         <Card className="lg:col-span-1">
-          <CardHeader className="pb-3 lg:pb-6"> {/* mobile-only: reduced padding */}
-            <CardTitle className="flex items-center gap-2 text-green-600 text-base lg:text-lg"> {/* mobile-only: smaller title */}
-              <FileText className="h-4 w-4 lg:h-5 lg:w-5" />
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <FileText className="h-5 w-5" />
               1. Selected Forms
             </CardTitle>
-            <p className="text-xs lg:text-sm text-gray-600">Forms that will be generated with prefilled data</p> {/* mobile-only: smaller text */}
+            <p className="text-sm text-gray-600">Forms that will be generated with prefilled data</p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 lg:space-y-3"> {/* mobile-only: adjusted spacing */}
+            <div className="space-y-2">
               {selectedFormItems.length > 0 ? (
                 selectedFormItems.map((form, index) => (
                   <button
@@ -803,23 +803,22 @@ export function PrefillPreviewPage() {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto"> {/* mobile-only: stack on mobile */}
+              <div className="flex gap-2">
                 {activeFormId && (
                   <Button 
                     onClick={() => handleDownloadSingleForm(activeFormId)}
                     disabled={isDownloading}
                     variant="outline"
-                    className="border-green-600 text-green-600 hover:bg-green-50 flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base w-full sm:w-auto" /* mobile-only: touch target */
+                    className="border-green-600 text-green-600 hover:bg-green-50 flex items-center gap-2"
                   >
                     <Download className="h-4 w-4" />
-                    <span className="hidden sm:inline">{isDownloading ? 'Downloading...' : 'Download This Form'}</span>
-                    <span className="sm:hidden">{isDownloading ? 'Downloading...' : 'This Form'}</span> {/* mobile-only: shorter text */}
+                    {isDownloading ? 'Downloading...' : 'Download This Form'}
                   </Button>
                 )}
                 <Button 
                   onClick={handleDownloadTemplate}
                   disabled={isDownloading || !selectedFormItems.length}
-                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base w-full sm:w-auto" /* mobile-only: touch target */
+                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
                 >
                   <Download className="h-4 w-4" />
                   {isDownloading ? 'Downloading...' : 'Download All'}
@@ -884,8 +883,8 @@ export function PrefillPreviewPage() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-4 lg:pt-6 border-t bg-white p-4 lg:p-6 rounded-lg"> {/* mobile-only: reduced padding */}
-        <Button variant="outline" onClick={navigateToFormPicker} className="min-h-[44px] lg:min-h-0 text-sm lg:text-base"> {/* mobile-only: touch target */}
+      <div className="flex items-center justify-between pt-6 border-t bg-white p-6 rounded-lg">
+        <Button variant="outline" onClick={navigateToFormPicker}>
           ← Back
         </Button>
       </div>

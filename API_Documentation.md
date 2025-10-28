@@ -1,5 +1,119 @@
 # API Documentation
 
+## Authentication API
+
+### POST /auth/login
+Authenticate user with LDAP and establish session.
+
+**Authentication Required:** No  
+**CSRF Protection:** No (login is exempt)
+
+#### Request
+```json
+{
+  "username": "john.doe",
+  "password": "password123"
+}
+```
+
+#### Response
+```json
+{
+  "access": "eyJhbGci...",  // JWT access token (15 min expiry)
+  "profile": {              // User profile
+    "id": "user-001",
+    "name": "John Doe",
+    "email": "john.doe@parks.nyc.gov",
+    "role": "Admin",
+    "permissions": { ... }
+  },
+  "xsrfHeader": "X-CSRF-Token"  // CSRF header name
+}
+```
+
+**Cookies Set:**
+- `refresh_token` (HttpOnly, Secure, SameSite=Strict) - 7 day expiry
+- `__Host-XSRF-TOKEN` (Secure, SameSite=Strict) - CSRF token
+
+#### Backend Process
+1. Validate credentials via LDAP bind: `nycdpr\{username}`
+2. Query user profile from `view_web_role_based_user_list`
+3. Generate JWT access token (AT) with 15 min expiry
+4. Generate JWT refresh token (RT) with JTI, register in whitelist
+5. Generate XSRF token for CSRF protection
+6. Return AT + profile in body, set RT + XSRF cookies
+
+---
+
+### POST /auth/refresh
+Refresh expired access token using refresh token cookie.
+
+**Authentication Required:** No (uses RT cookie)  
+**CSRF Protection:** Yes (X-CSRF-Token header required)
+
+#### Request
+```
+Headers:
+  X-CSRF-Token: {xsrfToken}
+  
+Body: (empty)
+```
+
+#### Response
+```json
+{
+  "access": "eyJhbGci..."  // New JWT access token
+}
+```
+
+**Cookies Updated:**
+- `refresh_token` (new token, old JTI revoked)
+- `__Host-XSRF-TOKEN` (new CSRF token)
+
+#### Backend Process
+1. Validate XSRF token (double-submit cookie pattern)
+2. Extract RT from cookie, verify signature and JTI
+3. Check JTI exists in whitelist (Redis/memory)
+4. Revoke old JTI immediately (delete from whitelist)
+5. Generate new RT with new JTI, register in whitelist
+6. Generate new AT
+7. Return new AT, set new RT + XSRF cookies
+
+---
+
+### POST /auth/logout
+Logout user and revoke refresh token.
+
+**Authentication Required:** Yes (Authorization header)  
+**CSRF Protection:** Yes (X-CSRF-Token header required)
+
+#### Request
+```
+Headers:
+  Authorization: Bearer {accessToken}
+  X-CSRF-Token: {xsrfToken}
+  
+Body: (empty)
+```
+
+#### Response
+```
+Status: 204 No Content
+```
+
+**Cookies Cleared:**
+- `refresh_token`
+- `__Host-XSRF-TOKEN`
+
+#### Backend Process
+1. Validate XSRF token
+2. Extract RT from cookie, decode JTI
+3. Delete JTI from whitelist (revoke token)
+4. Clear cookies
+5. Return 204
+
+---
+
 ## Form Field Mappings API
 
 ### Get Form Field Mappings with Project Context

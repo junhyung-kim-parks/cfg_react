@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { loadRuntimeConfig } from './services/api/runtime';
 import { TopHeader } from './components/layout/TopHeader';
 import { Sidebar } from './components/layout/Sidebar';
-import { MobileNavDrawer } from './components/layout/MobileNavDrawer'; // mobile-only
 import { HomePage } from './pages/HomePage';
 import { ProjectSearchPage } from './pages/ProjectSearchPage';
 import { FormPickerPage } from './pages/FormPickerPage';
@@ -29,7 +28,6 @@ const fallbackElement = (
 export default function App() {
   const [isConfigLoaded, setIsConfigLoaded] = useState(false);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false); // mobile-only: drawer state
 
   useEffect(() => {
     async function initializeApp() {
@@ -136,18 +134,9 @@ export default function App() {
         <ProjectProvider>
           <FormGeneratorProvider>
             <div className="min-h-screen bg-background flex">
-              {/* Desktop sidebar */}
               <Sidebar />
-              
-              {/* mobile-only: Mobile nav drawer */}
-              <MobileNavDrawer 
-                isOpen={isMobileNavOpen} 
-                onClose={() => setIsMobileNavOpen(false)} 
-              />
-              
-              <div className="flex-1 flex flex-col min-w-0">
-                {/* mobile-only: Pass hamburger handler to TopHeader */}
-                <TopHeader onMenuClick={() => setIsMobileNavOpen(true)} />
+              <div className="flex-1 flex flex-col">
+                <TopHeader />
                 <main className="flex-1 overflow-auto">
                   {renderCurrentPage()}
                 </main>
