@@ -401,18 +401,18 @@ export function FormLibraryPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-gray-50 min-h-full"> {/* mobile-only: reduced padding and spacing */}
       {/* Header */}
-      <div className="space-y-4">
+      <div className="space-y-3 lg:space-y-4"> {/* mobile-only: reduced spacing */}
         <div>
-          <h1 className="text-2xl text-gray-900">Form Library</h1>
-          <p className="text-gray-600">
+          <h1 className="text-xl lg:text-2xl text-gray-900">Form Library</h1> {/* mobile-only: smaller heading */}
+          <p className="text-sm lg:text-base text-gray-600"> {/* mobile-only: smaller text */}
             Upload, configure, and manage form templates. Supports both PDF forms and Word documents.
           </p>
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 items-start sm:items-center justify-between"> {/* mobile-only: reduced gap */}
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -442,25 +442,25 @@ export function FormLibraryPage() {
 
           {/* Upload Button */}
           <Button 
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 w-full sm:w-auto min-h-[44px]" /* mobile-only: full width + touch target */
             onClick={handleOpenUploadDialog}
           >
             <Upload className="h-4 w-4" />
-            Upload New Template
+            <span className="text-sm lg:text-base">Upload New Template</span> {/* mobile-only: smaller text */}
           </Button>
         </div>
 
         {/* Results Count */}
-        <div className="text-sm text-gray-600">
+        <div className="text-xs lg:text-sm text-gray-600"> {/* mobile-only: smaller text */}
           Showing {filteredForms.length} of {forms.length} templates
         </div>
       </div>
 
       {/* Forms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"> {/* mobile-only: reduced gap */}
         {filteredForms.map((form) => (
           <Card key={form.form_id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 lg:p-6"> {/* mobile-only: reduced padding */}
               {/* Header with ID and Type Badge */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -493,7 +493,7 @@ export function FormLibraryPage() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="flex-1 text-xs h-8 border-gray-300 hover:bg-gray-50"
+                  className="flex-1 text-xs h-9 lg:h-8 border-gray-300 hover:bg-gray-50 min-h-[44px] lg:min-h-0" /* mobile-only: larger touch target */
                   onClick={() => handleEditFields(form)}
                 >
                   <Edit className="h-3 w-3 mr-1" />
@@ -502,7 +502,7 @@ export function FormLibraryPage() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="flex-1 text-xs h-8 border-gray-300 hover:bg-gray-50"
+                  className="flex-1 text-xs h-9 lg:h-8 border-gray-300 hover:bg-gray-50 min-h-[44px] lg:min-h-0" /* mobile-only: larger touch target */
                 >
                   Preview
                 </Button>
@@ -541,9 +541,9 @@ export function FormLibraryPage() {
         </div>
       )}
 
-      {/* Field Editor Side Panel */}
+      {/* Field Editor Side Panel - mobile-only: full screen */}
       <Sheet open={isFieldEditorOpen} onOpenChange={setIsFieldEditorOpen}>
-        <SheetContent className="w-[600px] sm:w-[800px] max-w-[90vw]">
+        <SheetContent className="w-full sm:w-[600px] lg:w-[800px] max-w-full sm:max-w-[90vw]">
           <SheetHeader>
             <div className="flex items-center justify-between">
               <div>

@@ -284,81 +284,81 @@ export function ProjectSearchPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-gray-50 min-h-full"> {/* mobile-only: reduced padding */}
       {/* Header */}
       <div>
-        <h1 className="text-2xl text-gray-900 mb-2">NYC Parks Project Search</h1>
-        <p className="text-gray-600">Search and manage NYC Parks construction projects</p>
+        <h1 className="text-xl lg:text-2xl text-gray-900 mb-2">NYC Parks Project Search</h1> {/* mobile-only: smaller heading */}
+        <p className="text-sm lg:text-base text-gray-600">Search and manage NYC Parks construction projects</p> {/* mobile-only: smaller text */}
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4"> {/* mobile-only: reduced gap and adjusted columns */}
           <Card className="border-l-4 border-l-gray-500">
-            <CardContent className="p-4">
+            <CardContent className="p-3 lg:p-4"> {/* mobile-only: reduced padding */}
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Projects</p>
-                  <p className="text-2xl text-gray-900 mt-1">{stats.total}</p>
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm text-gray-600">Total Projects</p> {/* mobile-only: smaller text */}
+                  <p className="text-xl lg:text-2xl text-gray-900 mt-1">{stats.total}</p> {/* mobile-only: smaller number */}
                 </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <TableIcon className="h-5 w-5 text-gray-600" />
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0"> {/* mobile-only: smaller icon box */}
+                  <TableIcon className="h-4 w-4 lg:h-5 lg:w-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-blue-500">
-            <CardContent className="p-4">
+            <CardContent className="p-3 lg:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Active</p>
-                  <p className="text-2xl text-blue-600 mt-1">{stats.active}</p>
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm text-gray-600">Active</p>
+                  <p className="text-xl lg:text-2xl text-blue-600 mt-1">{stats.active}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-blue-600" />
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Activity className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-green-500">
-            <CardContent className="p-4">
+            <CardContent className="p-3 lg:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Completed</p>
-                  <p className="text-2xl text-green-600 mt-1">{stats.completed}</p>
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm text-gray-600">Completed</p>
+                  <p className="text-xl lg:text-2xl text-green-600 mt-1">{stats.completed}</p>
                 </div>
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-green-600" />
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BarChart3 className="h-4 w-4 lg:h-5 lg:w-5 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-green-600">
-            <CardContent className="p-4">
+            <CardContent className="p-3 lg:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Budget</p>
-                  <p className="text-2xl text-green-600 mt-1">{formatCurrency(stats.totalBudget)}</p>
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm text-gray-600">Total Budget</p>
+                  <p className="text-lg lg:text-2xl text-green-600 mt-1">{formatCurrency(stats.totalBudget)}</p>
                 </div>
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-green-600 text-lg">$</span>
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-green-600 text-base lg:text-lg">$</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-green-800">
-            <CardContent className="p-4">
+            <CardContent className="p-3 lg:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Spent</p>
-                  <p className="text-2xl text-green-800 mt-1">{formatCurrency(stats.totalSpent)}</p>
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm text-gray-600">Spent</p>
+                  <p className="text-lg lg:text-2xl text-green-800 mt-1">{formatCurrency(stats.totalSpent)}</p>
                 </div>
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-green-800 text-lg">$</span>
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-green-800 text-base lg:text-lg">$</span>
                 </div>
               </div>
             </CardContent>
@@ -368,46 +368,46 @@ export function ProjectSearchPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="search" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="search">Search Projects</TabsTrigger>
-          <TabsTrigger value="map">Map View</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 max-w-full lg:max-w-md"> {/* mobile-only: full width on mobile */}
+          <TabsTrigger value="search" className="text-sm lg:text-base">Search Projects</TabsTrigger>
+          <TabsTrigger value="map" className="text-sm lg:text-base">Map View</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="search" className="space-y-6">
+        <TabsContent value="search" className="space-y-4 lg:space-y-6"> {/* mobile-only: reduced spacing */}
           <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
+            <CardContent className="p-4 lg:p-6"> {/* mobile-only: reduced padding */}
+              <div className="space-y-3 lg:space-y-4"> {/* mobile-only: reduced spacing */}
                 <div>
-                  <h3 className="text-lg text-gray-900 mb-2">NYC Parks Project Search</h3>
-                  <p className="text-sm text-gray-600">Search and filter NYC Parks construction projects by park, team, contract number, and other criteria</p>
+                  <h3 className="text-base lg:text-lg text-gray-900 mb-2">NYC Parks Project Search</h3> {/* mobile-only: smaller heading */}
+                  <p className="text-xs lg:text-sm text-gray-600">Search and filter NYC Parks construction projects by park, team, contract number, and other criteria</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="relative flex-1 max-w-md">
+                <div className="flex items-center gap-3 lg:gap-4"> {/* mobile-only: reduced gap */}
+                  <div className="relative flex-1 max-w-full lg:max-w-md"> {/* mobile-only: full width */}
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search projects, parks, teams, contract numbers..."
+                      placeholder="Search projects..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 text-sm lg:text-base" /* mobile-only: smaller text */
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"> {/* mobile-only: stack on mobile */}
+                  <p className="text-xs lg:text-sm text-gray-600"> {/* mobile-only: smaller text */}
                     {filteredProjects.length > itemsPerPage 
                       ? `Showing ${startIndex + 1}-${Math.min(endIndex, filteredProjects.length)} of ${filteredProjects.length} projects`
                       : `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''} found`
                     }
                   </p>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto"> {/* mobile-only: full width buttons */}
                     <Button
                       variant={viewMode === 'table' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setViewMode('table')}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none text-sm min-h-[44px] lg:min-h-0" /* mobile-only: touch target */
                     >
                       Table
                     </Button>
@@ -415,6 +415,7 @@ export function ProjectSearchPage() {
                       variant={viewMode === 'cards' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setViewMode('cards')}
+                      className="flex-1 sm:flex-none text-sm min-h-[44px] lg:min-h-0" /* mobile-only: touch target */
                     >
                       Cards
                     </Button>
@@ -424,9 +425,9 @@ export function ProjectSearchPage() {
             </CardContent>
           </Card>
 
-          {/* Projects Table */}
+          {/* Projects Table - desktop only */}
           {viewMode === 'table' && (
-            <Card>
+            <Card className="hidden lg:block"> {/* mobile-only: hide on mobile */}
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -501,12 +502,91 @@ export function ProjectSearchPage() {
             </Card>
           )}
 
+          {/* mobile-only: Mobile card list for table view */}
+          {viewMode === 'table' && (
+            <div className="lg:hidden space-y-3"> {/* mobile-only: show cards on mobile */}
+              {currentPageProjects.map((project) => (
+                <Card key={project.project_id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-gray-900 line-clamp-2">{project.pi_short_description}</h3>
+                          <p className="text-xs text-gray-500 mt-1">{project.pi_park_contract_no}</p>
+                        </div>
+                        <Badge className={`${getStatusColor(project.pi_park_contract_status)} flex-shrink-0 text-xs`}>
+                          {project.pi_park_contract_status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-500">Type:</span>
+                          <p className="text-gray-900">{project.pi_project_type}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Park:</span>
+                          <p className="text-gray-900 truncate">{project.pi_park_name}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Progress:</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex-1 bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-green-600 h-2 rounded-full"
+                                style={{ width: `${project.pi_progress_to_date}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-600">{project.pi_progress_to_date}%</span>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Budget:</span>
+                          <p className="text-gray-900">{formatCurrency(project.pi_total_project_funding_amount)}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        {project.pi_managing_design_team_unit && (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="text-xs text-gray-500">Design:</span>
+                            <Badge className={`${getUnitColor(project.pi_managing_design_team_unit)} text-xs`}>
+                              {project.pi_managing_design_team_unit}
+                            </Badge>
+                          </div>
+                        )}
+                        {project.pi_managing_construction_team_unit && (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="text-xs text-gray-500">Construction:</span>
+                            <Badge className={`${getUnitColor(project.pi_managing_construction_team_unit)} text-xs`}>
+                              {project.pi_managing_construction_team_unit}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleProjectSelect(project)}
+                        className="w-full min-h-[44px] text-sm" /* mobile-only: full width + touch target */
+                      >
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Select Project
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
           {/* Projects Cards */}
           {viewMode === 'cards' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4"> {/* mobile-only: reduced gap */}
               {currentPageProjects.map((project) => (
                 <Card key={project.project_id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 lg:p-5"> {/* mobile-only: slightly more padding on desktop */}
                     <div className="space-y-3">
                       <div className="flex items-start justify-between">
                         <h3 className="text-sm text-gray-900 line-clamp-2">{project.pi_short_description}</h3>

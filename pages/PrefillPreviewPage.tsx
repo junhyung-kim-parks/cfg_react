@@ -8,7 +8,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Input } from '../components/ui/input';
 import { list as getFormList } from '../features/forms/services/forms.service';
 import { formFieldMappingsService } from '../features/forms/services/formFieldMappings.service';
-import { downloadTemplate } from '../services/api/download';
+import { downloadTemplate, downloadSingleFormPdf } from '../services/api/download';
 import { useFormGenerator } from '../contexts/FormGeneratorContext';
 import { getSelectedFormsFromUrl } from '../utils/urlParams';
 import type { FormItem } from '../features/forms/types';
@@ -344,6 +344,82 @@ export function PrefillPreviewPage() {
     };
   };
 
+  const handleDownloadSingleForm = async (formId: string) => {
+    if (!formId) {
+      toast.error('No form selected');
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      // Make sure form data is loaded
+      if (!loadedFormIds.has(formId)) {
+        console.log(`📄 PrefillPreviewPage: Loading data for ${formId} before download`);
+        await loadFormMapping(formId);
+      }
+
+      // Get the form mapping
+      const mapping = formMappings[formId];
+      if (!mapping) {
+        toast.error('Form mapping not found');
+        return;
+      }
+
+      // Prepare fields data - merge original with edited values
+      const hasDetailedMapping = mapping && Array.isArray(mapping.fields);
+      
+      let fieldsToSend: FormFieldEntry[] = [];
+      
+      if (hasDetailedMapping) {
+        // New API structure with detailed field info
+        const fieldEntries = mapping.fields as FormFieldEntry[];
+        
+        // Merge with edited values
+        fieldsToSend = fieldEntries.map(field => ({
+          ...field,
+          value: editedFieldsData[formId]?.[field.label] ?? field.value
+        }));
+      } else {
+        // Legacy structure - convert to new format
+        const fields = mapping.fields || {};
+        const mergedData = {
+          ...fields,
+          ...(editedFieldsData[formId] || {})
+        };
+        
+        fieldsToSend = Object.entries(mergedData).map(([key, value], index) => ({
+          map_id: `legacy-${index}`,
+          label: key,
+          value: value as string | number | boolean,
+          source_col: key,
+          data_type: typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'text' as 'text' | 'number' | 'boolean' | 'date',
+          display_order: index + 1
+        }));
+      }
+
+      console.log('📄 PrefillPreviewPage: Downloading single form:', {
+        formId,
+        pdfName: mapping.pdf,
+        fieldsCount: fieldsToSend.length,
+        editedFields: Object.keys(editedFieldsData[formId] || {}).length
+      });
+
+      // Call the single form download API
+      await downloadSingleFormPdf({
+        form_id: formId,
+        pdf: mapping.pdf,
+        fields: fieldsToSend
+      });
+      
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Failed to download PDF');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const handleDownloadTemplate = async () => {
     if (!selectedFormItems.length) {
       toast.error('No forms selected');
@@ -636,38 +712,38 @@ export function PrefillPreviewPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-gray-50 min-h-full"> {/* mobile-only: reduced padding */}
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"> {/* mobile-only: stack on mobile */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4 w-full lg:w-auto"> {/* mobile-only: stack button and text */}
           <Button
             variant="outline"
             size="sm"
             onClick={navigateToFormPicker}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base" /* mobile-only: touch target */
           >
             <ChevronLeft className="h-4 w-4" />
             Back
           </Button>
           <div>
-            <h1 className="text-2xl text-gray-900">Prefill Preview</h1>
-            <p className="text-gray-600">Review the values that will be written into the PDF fields</p>
+            <h1 className="text-xl lg:text-2xl text-gray-900">Prefill Preview</h1> {/* mobile-only: smaller heading */}
+            <p className="text-sm lg:text-base text-gray-600">Review the values that will be written into the PDF fields</p> {/* mobile-only: smaller text */}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6"> {/* mobile-only: reduced gap */}
         {/* Selected Forms Section */}
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <FileText className="h-5 w-5" />
+          <CardHeader className="pb-3 lg:pb-6"> {/* mobile-only: reduced padding */}
+            <CardTitle className="flex items-center gap-2 text-green-600 text-base lg:text-lg"> {/* mobile-only: smaller title */}
+              <FileText className="h-4 w-4 lg:h-5 lg:w-5" />
               1. Selected Forms
             </CardTitle>
-            <p className="text-sm text-gray-600">Forms that will be generated with prefilled data</p>
+            <p className="text-xs lg:text-sm text-gray-600">Forms that will be generated with prefilled data</p> {/* mobile-only: smaller text */}
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-2 lg:space-y-3"> {/* mobile-only: adjusted spacing */}
               {selectedFormItems.length > 0 ? (
                 selectedFormItems.map((form, index) => (
                   <button
@@ -727,14 +803,28 @@ export function PrefillPreviewPage() {
                 </p>
               </div>
               
-              <Button 
-                onClick={handleDownloadTemplate}
-                disabled={isDownloading || !selectedFormItems.length}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {isDownloading ? 'Downloading...' : 'Download Template'}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto"> {/* mobile-only: stack on mobile */}
+                {activeFormId && (
+                  <Button 
+                    onClick={() => handleDownloadSingleForm(activeFormId)}
+                    disabled={isDownloading}
+                    variant="outline"
+                    className="border-green-600 text-green-600 hover:bg-green-50 flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base w-full sm:w-auto" /* mobile-only: touch target */
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="hidden sm:inline">{isDownloading ? 'Downloading...' : 'Download This Form'}</span>
+                    <span className="sm:hidden">{isDownloading ? 'Downloading...' : 'This Form'}</span> {/* mobile-only: shorter text */}
+                  </Button>
+                )}
+                <Button 
+                  onClick={handleDownloadTemplate}
+                  disabled={isDownloading || !selectedFormItems.length}
+                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 min-h-[44px] lg:min-h-0 text-sm lg:text-base w-full sm:w-auto" /* mobile-only: touch target */
+                >
+                  <Download className="h-4 w-4" />
+                  {isDownloading ? 'Downloading...' : 'Download All'}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -794,8 +884,8 @@ export function PrefillPreviewPage() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t bg-white p-6 rounded-lg">
-        <Button variant="outline" onClick={navigateToFormPicker}>
+      <div className="flex items-center justify-between pt-4 lg:pt-6 border-t bg-white p-4 lg:p-6 rounded-lg"> {/* mobile-only: reduced padding */}
+        <Button variant="outline" onClick={navigateToFormPicker} className="min-h-[44px] lg:min-h-0 text-sm lg:text-base"> {/* mobile-only: touch target */}
           ← Back
         </Button>
       </div>

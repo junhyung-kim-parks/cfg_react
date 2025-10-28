@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Download, RefreshCw, X, AlertTriangle } from 'lucide-react';
+import { Download, RefreshCw, X, AlertTriangle, MoreVertical } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
+import { Card, CardContent } from '../../../components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -176,17 +177,71 @@ export function BatchJobsTable({ jobs, onRefresh }: BatchJobsTableProps) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-400 mb-2">
-          <AlertTriangle className="h-12 w-12 mx-auto" />
+          <AlertTriangle className="h-8 lg:h-12 w-8 lg:w-12 mx-auto" /> {/* mobile-only: smaller icon */}
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-1">No batch jobs found</h3>
-        <p className="text-gray-500">Try adjusting your filters or create a new batch job.</p>
+        <h3 className="text-base lg:text-lg font-medium text-gray-900 mb-1">No batch jobs found</h3> {/* mobile-only: smaller text */}
+        <p className="text-sm lg:text-base text-gray-500">Try adjusting your filters or create a new batch job.</p>
       </div>
     );
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <Table>
+    <>
+      {/* mobile-only: Card list for mobile */}
+      <div className="lg:hidden space-y-3">
+        {jobs.map((job) => (
+          <Card key={job.id} className={`${getRowBackground(job.status)} transition-colors`}>
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{job.requestedBy}</p>
+                    <p className="text-xs text-gray-500 font-mono mt-1">{job.contractNumber}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    {getStatusBadge(job.status)}
+                    {renderActionButtons(job)}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-500">Contract Root:</span>
+                    <p className="text-gray-900 font-mono">{job.contractRootSocialNumber}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Requested:</span>
+                    <p className="text-gray-900">{formatDate(job.dateRequested)}</p>
+                  </div>
+                  {job.dateGenerationStarted && (
+                    <div>
+                      <span className="text-gray-500">Started:</span>
+                      <p className="text-gray-900">{formatDate(job.dateGenerationStarted)}</p>
+                    </div>
+                  )}
+                  {job.dateGenerationCompleted && (
+                    <div>
+                      <span className="text-gray-500">Completed:</span>
+                      <p className="text-gray-900">{formatDate(job.dateGenerationCompleted)}</p>
+                    </div>
+                  )}
+                </div>
+
+                {job.status === 'Error' && job.errorMessage && (
+                  <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span className="break-words">{job.errorMessage}</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden lg:block border rounded-lg overflow-hidden">
+        <Table>
         <TableHeader>
           <TableRow className="bg-gray-50">
             <TableHead className="font-medium">Requested By</TableHead>
@@ -234,5 +289,6 @@ export function BatchJobsTable({ jobs, onRefresh }: BatchJobsTableProps) {
         </TableBody>
       </Table>
     </div>
+    </>
   );
 }

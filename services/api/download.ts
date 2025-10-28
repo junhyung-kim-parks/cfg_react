@@ -1,4 +1,5 @@
 import { getRuntimeConfig } from './runtime';
+import { mockDownloadTemplate, mockDownloadSingleFormPdf } from '../mocks/downloadMocks';
 
 export interface DownloadRequest {
   formIds: string[];
@@ -9,6 +10,19 @@ export interface DownloadRequest {
     location?: string;
   };
   formFieldsData?: {[formId: string]: any};
+}
+
+export interface SingleFormDownloadRequest {
+  form_id: string;
+  pdf: string;
+  fields: Array<{
+    map_id: string;
+    label: string;
+    value: string | number | boolean;
+    source_col: string;
+    data_type: 'text' | 'number' | 'boolean' | 'date';
+    display_order?: number;
+  }>;
 }
 
 export interface DownloadResponse {
@@ -79,103 +93,80 @@ export async function downloadTemplate(
 
   // Fallback: Mock download functionality
   console.log('📄 Download API: Using mock download fallback');
-  
-  // Create a mock PDF download
-  const mockDownload = () => {
-    const formNames = request.formIds.map(id => id.replace('FORM-', 'Form ')).join(', ');
-    const projectName = request.projectData?.name || 'Project';
-    const filename = `${projectName.replace(/[^a-zA-Z0-9]/g, '_')}_Forms_${request.formIds.join('_')}.pdf`;
-    
-    // Create a more detailed mock PDF with form field data
-    const fieldsText = request.formIds.map(formId => {
-      const fields = request.formFieldsData?.[formId] || {};
-      const fieldEntries = Object.entries(fields).slice(0, 5); // Show first 5 fields
-      return `Form ${formId}:\\n${fieldEntries.map(([key, value]) => `  ${key}: ${value}`).join('\\n')}`;
-    }).join('\\n\\n');
-    
-    const mockPdfContent = `%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
+  return mockDownloadTemplate(request);
+}
 
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
+/**
+ * Download a single filled PDF form
+ * @param request - Single form download request with form_id, pdf name, and fields
+ * @returns PDF blob for download
+ */
+export async function downloadSingleFormPdf(request: SingleFormDownloadRequest): Promise<void> {
+  const config = getRuntimeConfig();
+  const baseUrl = config.API_BASE?.trim();
 
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
->>
-endobj
+  console.log('📄 Single Form Download API: Starting download request', {
+    formId: request.form_id,
+    pdfName: request.pdf,
+    fieldsCount: request.fields.length,
+    baseUrl: baseUrl || 'mock mode',
+  });
 
-4 0 obj
-<<
-/Length 200
->>
-stream
-BT
-/F1 12 Tf
-72 720 Td
-(Generated Forms: ${formNames}) Tj
-0 -20 Td
-(Project: ${projectName}) Tj
-0 -20 Td
-(Generated on: ${new Date().toLocaleString()}) Tj
-0 -40 Td
-(Sample Field Data:) Tj
-0 -20 Td
-(${fieldsText.slice(0, 200)}) Tj
-ET
-endstream
-endobj
+  // If we have a base URL, try the real API first
+  if (baseUrl) {
+    try {
+      console.log('📄 Single Form Download API: Attempting HTTP request to:', `${baseUrl}/api/forms/fill-pdf`);
+      
+      const response = await fetch(`${baseUrl}/cfg/fill-pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
 
-xref
-0 5
-0000000000 65535 f 
-0000000009 00000 n 
-0000000074 00000 n 
-0000000120 00000 n 
-0000000179 00000 n 
-trailer
-<<
-/Size 5
-/Root 1 0 R
->>
-startxref
-400
-%%EOF`;
+      if (response.ok) {
+        console.log('📄 Single Form Download API: HTTP service succeeded, downloading PDF...');
+        
+        // Get the PDF blob from response
+        const blob = await response.blob();
+        
+        // Extract filename from Content-Disposition header or use default
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = request.pdf;
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, '');
+          }
+        }
+        
+        // Create download link and trigger download
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        
+        console.log('📄 Single Form Download API: PDF downloaded successfully:', filename);
+        return;
+      } else {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.warn('📄 Single Form Download API: HTTP service failed with status:', response.status, errorText);
+        throw new Error(`Failed to download PDF: ${response.status} ${errorText}`);
+      }
+    } catch (error) {
+      console.error('📄 Single Form Download API: HTTP service failed:', error);
+      throw error;
+    }
+  }
 
-    const blob = new Blob([mockPdfContent], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    
-    // Create download link and trigger download
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Clean up
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    
-    return {
-      success: true,
-      filename: filename,
-      downloadedFiles: request.formIds.length,
-      message: `Successfully generated ${request.formIds.length} form template(s)`
-    };
-  };
-
-  return mockDownload();
+  // Mock mode fallback
+  console.log('📄 Single Form Download API: Using mock download fallback');
+  mockDownloadSingleFormPdf(request);
 }

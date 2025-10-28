@@ -1,3 +1,4 @@
+// mobile-only
 import { 
   Home, 
   Search, 
@@ -12,7 +13,8 @@ import {
   FolderOpen,
   Eye,
   AlertTriangle,
-  Lock
+  Lock,
+  X
 } from 'lucide-react';
 
 import { useState, useEffect } from 'react';
@@ -21,6 +23,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useFormGenerator } from '../../contexts/FormGeneratorContext';
 import { cn } from '../ui/utils';
 import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../ui/sheet';
 import { NavigationGuard } from '../forms/NavigationGuard';
 import {
   AlertDialog,
@@ -59,8 +62,13 @@ const sidebarItems: SidebarItem[] = [
   { id: 'settings', label: 'Settings', icon: Settings, href: '/settings' }
 ];
 
-export function Sidebar() {
-  console.log('Sidebar: Rendering sidebar...');
+interface MobileNavDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
+  console.log('MobileNavDrawer: Rendering mobile nav drawer...');
   const { isProjectSelected } = useProject();
   const { isLoggedIn } = useAuth();
   const { hasUnsavedData, state: formGeneratorState } = useFormGenerator();
@@ -72,11 +80,12 @@ export function Sidebar() {
 
   useEffect(() => {
     const handleLocationChange = () => {
-      console.log('Sidebar: Location changed to:', window.location.pathname);
+      console.log('MobileNavDrawer: Location changed to:', window.location.pathname);
       setCurrentPath(window.location.pathname);
+      // Auto-close drawer on navigation
+      onClose();
     };
 
-    // Listen for both browser navigation and manual navigation events
     window.addEventListener('popstate', handleLocationChange);
     window.addEventListener('navigate', handleLocationChange);
     
@@ -84,7 +93,7 @@ export function Sidebar() {
       window.removeEventListener('popstate', handleLocationChange);
       window.removeEventListener('navigate', handleLocationChange);
     };
-  }, []);
+  }, [onClose]);
 
   // Auto-expand Form Generator menu when any of its routes are active
   useEffect(() => {
@@ -97,7 +106,7 @@ export function Sidebar() {
         prev.includes('form-generator') ? prev : [...prev, 'form-generator']
       );
     }
-  }, [currentPath]); // Remove expandedItems from dependencies to prevent infinite loop
+  }, [currentPath]);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -107,12 +116,10 @@ export function Sidebar() {
     );
   };
 
-  // Check if navigation requires authentication
   const requiresAuthentication = (href: string) => {
-    return href !== '/'; // Dashboard is accessible without login, everything else requires auth
+    return href !== '/';
   };
 
-  // Check if navigation requires project selection
   const requiresProjectSelection = (href: string) => {
     return href.startsWith('/forms/picker') || 
            href.startsWith('/forms/preview') || 
@@ -120,52 +127,37 @@ export function Sidebar() {
   };
 
   const handleNavigation = (href: string) => {
-    console.log('Sidebar: Navigation requested to:', href);
+    console.log('MobileNavDrawer: Navigation requested to:', href);
     
-    // Special handling for Form Picker - include selected forms if available
     if (href === '/forms/picker') {
       if (formGeneratorState.selectedForms.length > 0) {
         const selectedFormsParam = formGeneratorState.selectedForms.join(',');
         href = `/forms/picker?selected=${selectedFormsParam}`;
-        console.log('Sidebar: Updated Form Picker URL with selected forms:', href);
       }
     }
     
-    // Special handling for Prefill Preview
     if (href === '/forms/prefill-preview') {
-      // If we have selected forms in context, include them in the URL
       if (formGeneratorState.selectedForms.length > 0) {
         const selectedFormsParam = formGeneratorState.selectedForms.join(',');
         href = `/forms/prefill-preview?selected=${selectedFormsParam}`;
-        console.log('Sidebar: Updated Prefill Preview URL with selected forms:', href);
       }
     }
     
-    // Check if we're in a Form Generator flow and have unsaved data
     const isFormGeneratorFlow = currentPath.startsWith('/forms/project-search') ||
                                currentPath.startsWith('/forms/picker') ||
                                currentPath.startsWith('/forms/prefill-preview');
     
-    // Check if navigating away from Form Generator flow to non-generator routes
     const formGeneratorRoutes = ['/forms/project-search', '/forms/picker', '/forms/prefill-preview'];
     const isNavigatingAwayFromFlow = isFormGeneratorFlow && !formGeneratorRoutes.some(route => href.startsWith(route));
     
     if (isNavigatingAwayFromFlow && hasUnsavedData()) {
-      console.log('🛡️ Sidebar: Navigation guard triggered', {
-        currentPath,
-        targetHref: href,
-        isFormGeneratorFlow,
-        isNavigatingAwayFromFlow,
-        hasUnsavedData: hasUnsavedData()
-      });
+      console.log('🛡️ MobileNavDrawer: Navigation guard triggered');
       setPendingNavigation(href);
       setShowNavigationGuard(true);
       return;
     }
     
-    // Check authentication first
     if (requiresAuthentication(href) && !isLoggedIn) {
-      // Just navigate - the ProtectedRoute component will handle the auth check
       if ((window as any).manualNavigate) {
         (window as any).manualNavigate(href);
       } else {
@@ -179,7 +171,6 @@ export function Sidebar() {
       return;
     }
     
-    // Use global navigate function if available, fallback to location.href
     if ((window as any).manualNavigate) {
       (window as any).manualNavigate(href);
     } else {
@@ -206,15 +197,11 @@ export function Sidebar() {
       window.location.href = '/forms/project-search';
     }
   };
-  
-
 
   const renderSidebarItem = (item: SidebarItem, level = 0) => {
     const isExpanded = expandedItems.includes(item.id);
     const isActive = item.href === currentPath;
     const hasChildren = item.children && item.children.length > 0;
-    
-    // Check if any child is active for parent highlighting
     const isChildActive = hasChildren && item.children!.some(child => child.href === currentPath);
 
     return (
@@ -223,22 +210,21 @@ export function Sidebar() {
           <button
             onClick={() => handleNavigation(item.href!)}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors text-left",
+              "w-full flex items-center gap-3 px-4 py-3 text-base rounded-md transition-colors text-left min-h-[44px]", // mobile-only: larger touch targets
               level > 0 && "ml-6",
               isActive 
                 ? "bg-sidebar-primary text-sidebar-primary-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              // Add visual indicator for items that require project selection
               requiresProjectSelection(item.href) && !isProjectSelected && "opacity-75"
             )}
           >
-            <item.icon className="h-4 w-4 flex-shrink-0" />
+            <item.icon className="h-5 w-5 flex-shrink-0" />
             <span className="flex-1">{item.label}</span>
             {requiresAuthentication(item.href) && !isLoggedIn && (
-              <Lock className="h-3 w-3 text-gray-400 flex-shrink-0" />
+              <Lock className="h-4 w-4 text-gray-400 flex-shrink-0" />
             )}
             {requiresProjectSelection(item.href) && !isProjectSelected && (
-              <AlertTriangle className="h-3 w-3 text-yellow-400 flex-shrink-0" />
+              <AlertTriangle className="h-4 w-4 text-yellow-400 flex-shrink-0" />
             )}
           </button>
         ) : (
@@ -246,20 +232,20 @@ export function Sidebar() {
             variant="ghost"
             onClick={() => hasChildren && toggleExpanded(item.id)}
             className={cn(
-              "w-full justify-start gap-3 px-3 py-2 text-sm h-auto font-normal",
+              "w-full justify-start gap-3 px-4 py-3 text-base h-auto font-normal min-h-[44px]", // mobile-only: larger touch targets
               level > 0 && "ml-6",
               isChildActive 
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             )}
           >
-            <item.icon className="h-4 w-4 flex-shrink-0" />
+            <item.icon className="h-5 w-5 flex-shrink-0" />
             <span className="flex-1 text-left">{item.label}</span>
             {hasChildren && (
               isExpanded ? (
-                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                <ChevronDown className="h-5 w-5 flex-shrink-0" />
               ) : (
-                <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                <ChevronRight className="h-5 w-5 flex-shrink-0" />
               )
             )}
           </Button>
@@ -276,28 +262,40 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar - hidden on mobile */}
-      <aside className="hidden lg:flex w-64 min-h-screen bg-sidebar border-r border-sidebar-border">
-        <div className="p-4 h-full w-full">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
-              <img 
-                src="/assets/nyc-parks-logo.svg" 
-                alt="NYC Parks Logo" 
-                className="w-8 h-8 object-contain"
-              />
+      {/* mobile-only: Full-screen drawer */}
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent side="left" className="w-full sm:w-80 p-0 bg-sidebar">
+          <SheetHeader className="p-4 border-b border-sidebar-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/assets/nyc-parks-logo.svg" 
+                    alt="NYC Parks Logo" 
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <div>
+                  <SheetTitle className="text-sidebar-foreground">Construction</SheetTitle>
+                  <p className="text-sm text-sidebar-foreground/70">Form Generator</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="text-sidebar-foreground hover:bg-sidebar-accent"
+              >
+                <X className="h-5 w-5" />
+              </Button>
             </div>
-            <div>
-              <h2 className="font-semibold text-sidebar-foreground">Construction</h2>
-              <p className="text-sm text-sidebar-foreground/70">Form Generator</p>
-            </div>
-          </div>
+          </SheetHeader>
           
-          <nav className="space-y-1">
+          <nav className="p-4 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 100px)' }}>
             {sidebarItems.map(item => renderSidebarItem(item))}
           </nav>
-        </div>
-      </aside>
+        </SheetContent>
+      </Sheet>
 
       {/* Project Selection Warning Dialog */}
       <AlertDialog open={showWarningDialog} onOpenChange={setShowWarningDialog}>
