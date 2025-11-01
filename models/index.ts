@@ -12,6 +12,18 @@ export interface FormItem {
   fieldCount?: number;
   createdAt?: string;
   updatedAt?: string;
+  hasEEItems?: boolean;  // True if form supports EE Items (FORM-022A)
+}
+
+// Engineer's Estimate (EE) Item for Change Orders
+export interface EEItemEntry {
+  id: string;
+  ee_item_id: string;
+  description: string;
+  unit: string;
+  bid_price: number;
+  qty: number;
+  total: number;
 }
 
 export interface FormCatalog {

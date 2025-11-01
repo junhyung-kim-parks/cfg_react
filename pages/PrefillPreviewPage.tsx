@@ -6,6 +6,8 @@ import { Badge } from '../components/ui/badge';
 import { Label } from '../components/ui/label';
 import { Checkbox } from '../components/ui/checkbox';
 import { Input } from '../components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { EEItemsManager } from '../features/forms/components/EEItemsManager';
 import { list as getFormList } from '../features/forms/services/forms.service';
 import { formFieldMappingsService } from '../features/forms/services/formFieldMappings.service';
 import { downloadTemplate, downloadSingleFormPdf } from '../services/api/download';
@@ -13,6 +15,7 @@ import { useFormGenerator } from '../contexts/FormGeneratorContext';
 import { getSelectedFormsFromUrl } from '../utils/urlParams';
 import type { FormItem } from '../features/forms/types';
 import type { Project } from '../features/projects/types';
+import type { EEItemEntry } from '../models';
 import { toast } from 'sonner@2.0.3';
 
 interface PrefillData {
@@ -45,6 +48,7 @@ export function PrefillPreviewPage() {
   const [loadedFormIds, setLoadedFormIds] = useState<Set<string>>(new Set());
   const [isDownloading, setIsDownloading] = useState(false);
   const [editedFieldsData, setEditedFieldsData] = useState<{[formId: string]: FormFieldData}>({});
+  const [eeItems, setEEItems] = useState<{[formId: string]: EEItemEntry[]}>({});
   const hasMounted = useRef(false);
 
   // Set current step when component mounts
@@ -323,6 +327,14 @@ export function PrefillPreviewPage() {
     }));
   };
 
+  // Handle EE items changes
+  const handleEEItemsChange = (formId: string, items: EEItemEntry[]) => {
+    setEEItems(prev => ({
+      ...prev,
+      [formId]: items
+    }));
+  };
+
   // Generate sample form fields based on form type and prefill data
   const generateFormFields = (form: FormItem): FormFieldData => {
     return {
@@ -401,15 +413,25 @@ export function PrefillPreviewPage() {
         formId,
         pdfName: mapping.pdf,
         fieldsCount: fieldsToSend.length,
-        editedFields: Object.keys(editedFieldsData[formId] || {}).length
+        editedFields: Object.keys(editedFieldsData[formId] || {}).length,
+        eeItemsCount: eeItems[formId]?.length || 0
       });
 
-      // Call the single form download API
-      await downloadSingleFormPdf({
+      // Prepare download request with EE items if applicable
+      const downloadRequest: any = {
         form_id: formId,
         pdf: mapping.pdf,
         fields: fieldsToSend
-      });
+      };
+
+      // Include EE items for FORM-022A
+      if (formId === 'FORM-022A' && eeItems[formId]?.length > 0) {
+        downloadRequest.ee_items = eeItems[formId];
+        console.log('📄 PrefillPreviewPage: Including EE items in download:', eeItems[formId]);
+      }
+
+      // Call the single form download API
+      await downloadSingleFormPdf(downloadRequest);
       
       toast.success('PDF downloaded successfully');
     } catch (error) {
@@ -458,14 +480,16 @@ export function PrefillPreviewPage() {
         formIds: selectedFormIds,
         projectData,
         fieldsDataKeys: Object.keys(mergedFormFieldsData),
-        editedFieldsCount: Object.keys(editedFieldsData).length
+        editedFieldsCount: Object.keys(editedFieldsData).length,
+        eeItemsData: Object.keys(eeItems).filter(key => eeItems[key]?.length > 0)
       });
 
-      // Use the new download API with merged data
+      // Use the new download API with merged data and EE items
       const result = await downloadTemplate({
         formIds: selectedFormIds,
         formFieldsData: mergedFormFieldsData,
-        projectData
+        projectData,
+        eeItemsData: eeItems
       });
       
       if (result.success) {
@@ -838,41 +862,101 @@ export function PrefillPreviewPage() {
                 <p className="text-gray-600">Loading form data...</p>
               </div>
             ) : (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Building className="h-4 w-4" />
-                    {activeFormId} Fields
-                  </h4>
-                  <div className="text-xs text-gray-500">
-                    Template: {formMappings[activeFormId]?.pdf || `${activeFormId}.pdf`}
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div>
-                    {renderFormFields(activeFormId)}
-                  </div>
-                  
-                  {/* Field count - handle both new and legacy API structures */}
-                  {(() => {
-                    const mapping = formMappings[activeFormId];
-                    let totalFields = 0;
+              <div className="space-y-6">
+                {/* Show tabs only for forms with EE items (FORM-022A) */}
+                {activeFormId === 'FORM-022A' ? (
+                  <Tabs defaultValue="general" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="general">General</TabsTrigger>
+                      <TabsTrigger value="ee-items">EE Items</TabsTrigger>
+                    </TabsList>
                     
-                    if (mapping && Array.isArray(mapping.fields)) {
-                      totalFields = mapping.fields.length;
-                    } else {
-                      totalFields = Object.keys(formFieldsData[activeFormId] || {}).length;
-                    }
-                    
-                    return totalFields > 10 ? (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 text-center">
-                          {totalFields} fields total
-                        </p>
+                    <TabsContent value="general" className="mt-4">
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            {activeFormId} Fields
+                          </h4>
+                          <div className="text-xs text-gray-500">
+                            Template: {formMappings[activeFormId]?.pdf || `${activeFormId}.pdf`}
+                          </div>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <div>
+                            {renderFormFields(activeFormId)}
+                          </div>
+                          
+                          {/* Field count - handle both new and legacy API structures */}
+                          {(() => {
+                            const mapping = formMappings[activeFormId];
+                            let totalFields = 0;
+                            
+                            if (mapping && Array.isArray(mapping.fields)) {
+                              totalFields = mapping.fields.length;
+                            } else {
+                              totalFields = Object.keys(formFieldsData[activeFormId] || {}).length;
+                            }
+                            
+                            return totalFields > 10 ? (
+                              <div className="mt-3 pt-3 border-t border-gray-200">
+                                <p className="text-xs text-gray-500 text-center">
+                                  {totalFields} fields total
+                                </p>
+                              </div>
+                            ) : null;
+                          })()}
+                        </div>
                       </div>
-                    ) : null;
-                  })()}
-                </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="ee-items" className="mt-4">
+                      <EEItemsManager
+                        formId={activeFormId}
+                        items={eeItems[activeFormId] || []}
+                        onChange={(items) => handleEEItemsChange(activeFormId, items)}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                ) : (
+                  // For forms without EE items, show just the fields without tabs
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <Building className="h-4 w-4" />
+                        {activeFormId} Fields
+                      </h4>
+                      <div className="text-xs text-gray-500">
+                        Template: {formMappings[activeFormId]?.pdf || `${activeFormId}.pdf`}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div>
+                        {renderFormFields(activeFormId)}
+                      </div>
+                      
+                      {/* Field count - handle both new and legacy API structures */}
+                      {(() => {
+                        const mapping = formMappings[activeFormId];
+                        let totalFields = 0;
+                        
+                        if (mapping && Array.isArray(mapping.fields)) {
+                          totalFields = mapping.fields.length;
+                        } else {
+                          totalFields = Object.keys(formFieldsData[activeFormId] || {}).length;
+                        }
+                        
+                        return totalFields > 10 ? (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <p className="text-xs text-gray-500 text-center">
+                              {totalFields} fields total
+                            </p>
+                          </div>
+                        ) : null;
+                      })()}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

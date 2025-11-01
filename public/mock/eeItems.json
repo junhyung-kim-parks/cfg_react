@@ -1,0 +1,242 @@
+[
+  {
+    "ee_item_id": "EE-001",
+    "description": "Excavation - Common",
+    "unit": "CY",
+    "category": "Earthwork"
+  },
+  {
+    "ee_item_id": "EE-002",
+    "description": "Excavation - Rock",
+    "unit": "CY",
+    "category": "Earthwork"
+  },
+  {
+    "ee_item_id": "EE-003",
+    "description": "Fill - Select",
+    "unit": "CY",
+    "category": "Earthwork"
+  },
+  {
+    "ee_item_id": "EE-004",
+    "description": "Fill - Structural",
+    "unit": "CY",
+    "category": "Earthwork"
+  },
+  {
+    "ee_item_id": "EE-005",
+    "description": "Concrete - Class A",
+    "unit": "CY",
+    "category": "Concrete"
+  },
+  {
+    "ee_item_id": "EE-006",
+    "description": "Concrete - Class B",
+    "unit": "CY",
+    "category": "Concrete"
+  },
+  {
+    "ee_item_id": "EE-007",
+    "description": "Concrete - Class C",
+    "unit": "CY",
+    "category": "Concrete"
+  },
+  {
+    "ee_item_id": "EE-008",
+    "description": "Reinforcing Steel - #4",
+    "unit": "LB",
+    "category": "Steel"
+  },
+  {
+    "ee_item_id": "EE-009",
+    "description": "Reinforcing Steel - #5",
+    "unit": "LB",
+    "category": "Steel"
+  },
+  {
+    "ee_item_id": "EE-010",
+    "description": "Reinforcing Steel - #6",
+    "unit": "LB",
+    "category": "Steel"
+  },
+  {
+    "ee_item_id": "EE-011",
+    "description": "Asphalt Pavement - 2 inch",
+    "unit": "SY",
+    "category": "Paving"
+  },
+  {
+    "ee_item_id": "EE-012",
+    "description": "Asphalt Pavement - 3 inch",
+    "unit": "SY",
+    "category": "Paving"
+  },
+  {
+    "ee_item_id": "EE-013",
+    "description": "Concrete Pavement - 6 inch",
+    "unit": "SY",
+    "category": "Paving"
+  },
+  {
+    "ee_item_id": "EE-014",
+    "description": "Concrete Pavement - 8 inch",
+    "unit": "SY",
+    "category": "Paving"
+  },
+  {
+    "ee_item_id": "EE-015",
+    "description": "Chain Link Fence - 6 ft",
+    "unit": "LF",
+    "category": "Site Work"
+  },
+  {
+    "ee_item_id": "EE-016",
+    "description": "Chain Link Fence - 8 ft",
+    "unit": "LF",
+    "category": "Site Work"
+  },
+  {
+    "ee_item_id": "EE-017",
+    "description": "Catch Basin",
+    "unit": "EA",
+    "category": "Drainage"
+  },
+  {
+    "ee_item_id": "EE-018",
+    "description": "Manhole",
+    "unit": "EA",
+    "category": "Drainage"
+  },
+  {
+    "ee_item_id": "EE-019",
+    "description": "Storm Drain Pipe - 12 inch",
+    "unit": "LF",
+    "category": "Drainage"
+  },
+  {
+    "ee_item_id": "EE-020",
+    "description": "Storm Drain Pipe - 18 inch",
+    "unit": "LF",
+    "category": "Drainage"
+  },
+  {
+    "ee_item_id": "EE-021",
+    "description": "Water Main - 6 inch",
+    "unit": "LF",
+    "category": "Utilities"
+  },
+  {
+    "ee_item_id": "EE-022",
+    "description": "Water Main - 8 inch",
+    "unit": "LF",
+    "category": "Utilities"
+  },
+  {
+    "ee_item_id": "EE-023",
+    "description": "Sanitary Sewer - 8 inch",
+    "unit": "LF",
+    "category": "Utilities"
+  },
+  {
+    "ee_item_id": "EE-024",
+    "description": "Sanitary Sewer - 10 inch",
+    "unit": "LF",
+    "category": "Utilities"
+  },
+  {
+    "ee_item_id": "EE-025",
+    "description": "Lighting Pole - 20 ft",
+    "unit": "EA",
+    "category": "Electrical"
+  },
+  {
+    "ee_item_id": "EE-026",
+    "description": "Lighting Pole - 30 ft",
+    "unit": "EA",
+    "category": "Electrical"
+  },
+  {
+    "ee_item_id": "EE-027",
+    "description": "LED Fixture",
+    "unit": "EA",
+    "category": "Electrical"
+  },
+  {
+    "ee_item_id": "EE-028",
+    "description": "Electrical Conduit - 2 inch",
+    "unit": "LF",
+    "category": "Electrical"
+  },
+  {
+    "ee_item_id": "EE-029",
+    "description": "Topsoil",
+    "unit": "CY",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-030",
+    "description": "Sod",
+    "unit": "SF",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-031",
+    "description": "Tree - 2 inch Caliper",
+    "unit": "EA",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-032",
+    "description": "Tree - 3 inch Caliper",
+    "unit": "EA",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-033",
+    "description": "Shrubs - 5 Gallon",
+    "unit": "EA",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-034",
+    "description": "Mulch",
+    "unit": "CY",
+    "category": "Landscaping"
+  },
+  {
+    "ee_item_id": "EE-035",
+    "description": "Playground Equipment",
+    "unit": "LS",
+    "category": "Site Furnishings"
+  },
+  {
+    "ee_item_id": "EE-036",
+    "description": "Park Bench",
+    "unit": "EA",
+    "category": "Site Furnishings"
+  },
+  {
+    "ee_item_id": "EE-037",
+    "description": "Picnic Table",
+    "unit": "EA",
+    "category": "Site Furnishings"
+  },
+  {
+    "ee_item_id": "EE-038",
+    "description": "Trash Receptacle",
+    "unit": "EA",
+    "category": "Site Furnishings"
+  },
+  {
+    "ee_item_id": "EE-039",
+    "description": "Bike Rack",
+    "unit": "EA",
+    "category": "Site Furnishings"
+  },
+  {
+    "ee_item_id": "EE-040",
+    "description": "Signage - Directional",
+    "unit": "EA",
+    "category": "Signage"
+  }
+]

@@ -383,7 +383,8 @@ export const formCatalogData: FormItem[] = [
     form_version: "1.0",
     form_description: "Primary change order form for contract modifications",
     form_file_path: "/forms/FORM-022A.pdf",
-    fieldCount: 3
+    fieldCount: 3,
+    hasEEItems: true
   },
   {
     form_id: "FORM-022B",

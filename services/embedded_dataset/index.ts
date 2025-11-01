@@ -5,6 +5,8 @@ export { projectCatalog } from './projectCatalog';
 export { generateAuditLogs } from './auditLogs';
 export { generateUsers } from './users';
 export { generateBatchProcessingData } from './batchProcessing';
+export { EMBEDDED_EE_ITEMS } from './eeItems';
+export type { EEItem } from './eeItems';
 
 // Dataset registry for dynamic lookups
 export const datasetRegistry = {
@@ -14,6 +16,7 @@ export const datasetRegistry = {
   'auditLogs': () => import('./auditLogs').then(m => m.generateAuditLogs),
   'users': () => import('./users').then(m => m.generateUsers),
   'batchProcessing': () => import('./batchProcessing').then(m => m.generateBatchProcessingData),
+  'eeItems': () => import('./eeItems').then(m => m.EMBEDDED_EE_ITEMS),
 } as const;
 
 export type DatasetKey = keyof typeof datasetRegistry;
